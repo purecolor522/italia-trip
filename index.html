@@ -2677,7 +2677,7 @@ const CITY_LIST = [
   ['Napoli','那不勒斯'],['Pisa','比薩'],['Verona','維羅納'],['Bologna','波隆那'],
   ['Sorrento','蘇連多'],['Capri','卡布里'],['Amalfi','阿瑪菲'],['Positano','波西塔諾'],
   ['Pompei','龐貝'],['Siena','西恩納'],['Cinque Terre','五漁村'],['Assisi','阿西西'],
-  ['Vaticano','梵蒂岡'],['San Gimignano','聖吉米納諾'],['Taiwan','台灣']
+  ['Vaticano','梵蒂岡'],['San Gimignano','聖吉米納諾'],['Taiwan','台灣'],['Taoyuan','桃園'],['Dubai','杜拜']
 ];
 const CITY_COORDS = {
   'Roma':        { lat: 41.9028, lng: 12.4964, zh: '羅馬' },
@@ -2699,6 +2699,8 @@ const CITY_COORDS = {
   'Vaticano':    { lat: 41.9029, lng: 12.4534, zh: '梵蒂岡' },
   'San Gimignano':{ lat: 43.4674, lng: 11.0431, zh: '聖吉米納諾' },
   'Taiwan':       { lat: 25.0330, lng:121.5654, zh: '台灣' },
+  'Taoyuan':      { lat: 25.0797, lng:121.2342, zh: '桃園' },
+  'Dubai':        { lat: 25.2532, lng: 55.3657, zh: '杜拜' },
 };
 const FALLBACK_RATES = { EUR: 34.5, USD: 32.0, JPY: 0.21, GBP: 41.0, CHF: 36.5, TWD: 1 };
 const CUR_SYMBOL = { EUR: '€', USD: '$', JPY: '¥', GBP: '£', CHF: 'CHF ', TWD: 'NT$' };
@@ -2726,8 +2728,8 @@ function buildSampleItinerary() {
   const itineraries = {};
   // Day 1 · 5/15 桃園 → 杜拜
   itineraries[day(0)] = [
-    { id: uid(), time: '20:05', place: '桃園機場第二航廈集合', city: 'Milano', notes: '阿聯酋航空櫃台 · 領隊：黃博榮 0920-077-877\n團號：AASEK1160515MXP（巨匠旅遊-綠色）', duration: '集合' },
-    { id: uid(), time: '23:05', place: 'EK367 桃園 → 杜拜', city: 'Milano', notes: '航行 9h30m · 抵達 04:35+1\n夜宿機上', duration: '航班' },
+    { id: uid(), time: '20:05', place: '桃園機場第二航廈集合', city: 'Dubai', notes: '阿聯酋航空櫃台 · 領隊：黃博榮 0920-077-877\n團號：AASEK1160515MXP（巨匠旅遊-綠色）', category: '集合' },
+    { id: uid(), time: '23:05', place: 'EK367 桃園 → 杜拜', city: 'Dubai', notes: '航行 9h30m · 抵達 04:35+1\n夜宿機上', category: '航班' },
   ];
   // Day 2 · 5/16 杜拜 → 米蘭
   itineraries[day(1)] = [
@@ -2817,8 +2819,8 @@ function buildSampleItinerary() {
   ];
   // Day 11 · 5/25 杜拜 → 桃園
   itineraries[day(10)] = [
-    { id: uid(), time: '03:45', place: 'EK366 杜拜 → 桃園', city: 'Roma', notes: '航行 8h25m · 抵達 16:10', duration: '航班' },
-    { id: uid(), time: '16:10', place: '抵達桃園機場', city: 'Roma', notes: '結束義大利深度之旅 · 平安回家', duration: '入境' },
+    { id: uid(), time: '03:45', place: 'EK366 杜拜 → 桃園', city: 'Taoyuan', notes: '航行 8h25m · 抵達 16:10', category: '航班' },
+    { id: uid(), time: '16:10', place: '抵達桃園機場', city: 'Taoyuan', notes: '結束義大利深度之旅 · 平安回家', category: '入境' },
   ];
   const backups = [
     { id: uid(), name: 'Galleria Borghese', city: 'Roma', notes: '羅馬最美的私人博物館，需預約。貝尼尼雕塑必看。' },
@@ -4867,6 +4869,30 @@ function populateBkDateSelect() {
   }).join('');
 }
 
+function migrateDay1Day11Cities() {
+  if (state._d1d11_cities_v1) return;
+  const start = new Date(state.trip.startDate);
+  const day1 = state.trip.startDate;
+  const d11 = new Date(start); d11.setDate(d11.getDate() + 10);
+  const day11 = d11.toISOString().slice(0, 10);
+  if (state.itineraries[day1]) {
+    state.itineraries[day1].forEach(item => {
+      if (item.city === 'Milano' && (item.place.includes('桃園') || item.place.includes('EK367') || item.place.includes('杜拜'))) {
+        item.city = 'Dubai';
+      }
+    });
+  }
+  if (state.itineraries[day11]) {
+    state.itineraries[day11].forEach(item => {
+      if (item.city === 'Roma' && (item.place.includes('桃園') || item.place.includes('EK366'))) {
+        item.city = 'Taoyuan';
+      }
+    });
+  }
+  state._d1d11_cities_v1 = true;
+  saveState();
+}
+
 function migrateBackupsAddDate() {
   if (state._backups_with_date_v1) return;
   if (Array.isArray(state.backups)) {
@@ -4963,6 +4989,7 @@ function init() {
   migrateDurationToCategory();
   migrateTaipeiToTaiwan();
   migrateDay5();
+  migrateDay1Day11Cities();
   const dates = genDates();
   if (!dates.find(d => d.iso === currentDate)) currentDate = dates[0].iso;
   renderDateStrip();
