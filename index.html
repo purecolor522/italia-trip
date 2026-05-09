@@ -2662,6 +2662,11 @@
     </div>
     <button class="btn btn-primary" id="set-save">套用</button>
     <div style="height:10px;"></div>
+    <button class="btn btn-secondary" id="set-export">匯出備份檔（JSON）</button>
+    <div style="height:8px;"></div>
+    <button class="btn btn-secondary" id="set-import">匯入備份檔</button>
+    <input type="file" id="import-file-input" accept=".json,application/json" style="display:none;" />
+    <div style="height:10px;"></div>
     <button class="btn btn-secondary" id="set-load-sample">載入義大利 11 日範例行程</button>
     <div style="height:10px;"></div>
     <button class="btn btn-danger" id="set-clear">清除全部資料</button>
@@ -3606,6 +3611,49 @@ document.getElementById('set-clear').addEventListener('click', () => {
   if (!confirm('確定要清除全部資料嗎？此動作無法復原。')) return;
   localStorage.removeItem(STORAGE_KEY);
   location.reload();
+});
+
+document.getElementById('set-export').addEventListener('click', () => {
+  const data = JSON.stringify(state, null, 2);
+  const blob = new Blob([data], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+  a.download = `italia-trip-${dateStr}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 100);
+  toast('已匯出備份檔');
+});
+
+document.getElementById('set-import').addEventListener('click', () => {
+  document.getElementById('import-file-input').click();
+});
+
+document.getElementById('import-file-input').addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    try {
+      const imported = JSON.parse(ev.target.result);
+      if (!imported.itineraries || !imported.trip) {
+        toast('檔案內容無效');
+        return;
+      }
+      if (!confirm('確定要用這份備份覆蓋目前所有資料嗎？此動作無法復原。')) return;
+      state = imported;
+      saveState();
+      toast('已匯入備份，重新載入中…');
+      setTimeout(() => location.reload(), 600);
+    } catch (err) {
+      toast('檔案格式錯誤：' + err.message);
+    }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
 });
 
 document.getElementById('itin-save').addEventListener('click', saveItin);
