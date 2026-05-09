@@ -1,19 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
   <rect width="512" height="512" rx="108" fill="#F2EBD8"/>
-  <g transform="translate(56 99) scale(2.86)">
-    <!-- Pin (top-left) -->
-    <g transform="translate(18 38) scale(0.55)">
-      <path d="M0 8 C -12 0 -14 -8 -14 -14 C -14 -22 -8 -28 0 -28 C 8 -28 14 -22 14 -14 C 14 -8 12 0 0 8 Z" fill="#876238"/>
-      <circle cx="0" cy="-14" r="5" fill="#FAF6EC"/>
-    </g>
-    <!-- Dashed S-curve trail -->
-    <path d="M 18 44 C 28 72 58 86 86 74"
-          fill="none" stroke="#876238" stroke-width="2.4"
-          stroke-dasharray="3 5" stroke-linecap="round"/>
-    <!-- Airplane silhouette -->
-    <g transform="translate(108 52) rotate(45) scale(1.9)">
-      <path d="M 0 -19 C 2.4 -19 3.4 -17 3.4 -10 L 3.4 -2 L 19 4 C 20 4.3 20 6.7 19 7 L 3.4 5 L 3.4 12 L 8 16.5 C 8.3 16.8 8.3 18.2 8 18.5 L 0 15.5 L -8 18.5 C -8.3 18.2 -8.3 16.8 -8 16.5 L -3.4 12 L -3.4 5 L -19 7 C -20 6.7 -20 4.3 -19 4 L -3.4 -2 L -3.4 -10 C -3.4 -17 -2.4 -19 0 -19 Z"
-            fill="#876238"/>
-    </g>
+  <g transform="translate(256 256) rotate(45) scale(7)" fill="#876238">
+    <path d="M 0 -19 C 2.4 -19 3.4 -17 3.4 -10 L 3.4 -2 L 19 4 C 20 4.3 20 6.7 19 7 L 3.4 5 L 3.4 12 L 8 16.5 C 8.3 16.8 8.3 18.2 8 18.5 L 0 15.5 L -8 18.5 C -8.3 18.2 -8.3 16.8 -8 16.5 L -3.4 12 L -3.4 5 L -19 7 C -20 6.7 -20 4.3 -19 4 L -3.4 -2 L -3.4 -10 C -3.4 -17 -2.4 -19 0 -19 Z"/>
   </g>
 </svg>

@@ -1,0 +1,7 @@
+.git
+.gitignore
+.DS_Store
+*.pdf
+fly.toml
+Dockerfile
+.dockerignore
