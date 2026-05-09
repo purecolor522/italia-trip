@@ -1402,97 +1402,6 @@
   .pill:active { transform: scale(.95); }
   .pill.active { background: var(--ink-900); color: var(--oat-100); }
 
-  /* Sync section */
-  .sync-divider {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin: 22px 0 12px;
-    color: var(--ink-500);
-    font-size: 12px;
-    font-family: 'Cormorant Garamond', serif;
-    font-style: italic;
-    letter-spacing: .15em;
-  }
-  .sync-divider::before, .sync-divider::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: var(--ink-100);
-  }
-  .sync-status-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 12px;
-    padding: 10px 14px;
-    background: var(--oat-100);
-    border-radius: 12px;
-    font-size: 13px;
-  }
-  .sync-indicator {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    font-weight: 600;
-  }
-  .sync-indicator::before {
-    content: '';
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: var(--ink-300);
-  }
-  .sync-indicator.synced::before {
-    background: var(--accent-sage);
-    box-shadow: 0 0 0 3px rgba(122, 138, 110, .25);
-  }
-  .sync-indicator.syncing::before {
-    background: var(--tan-500);
-    animation: syncPulse 1.2s infinite ease-in-out;
-  }
-  .sync-indicator.connecting::before {
-    background: var(--tan-500);
-    animation: syncPulse 1.2s infinite ease-in-out;
-  }
-  .sync-indicator.error::before { background: var(--accent-rose); }
-  .sync-indicator.idle { color: var(--ink-500); }
-  @keyframes syncPulse {
-    0%, 100% { opacity: .6; transform: scale(.85); }
-    50% { opacity: 1; transform: scale(1.15); }
-  }
-  .sync-status-row .device-id {
-    font-size: 11px;
-    color: var(--ink-500);
-    font-family: 'Cormorant Garamond', serif;
-    font-style: italic;
-  }
-  .sync-code-row {
-    display: flex; gap: 6px;
-  }
-  .sync-code-row input {
-    flex: 1;
-    font-family: 'Cormorant Garamond', monospace;
-    font-size: 13px;
-    letter-spacing: .03em;
-  }
-  .sync-or {
-    text-align: center;
-    margin: 14px 0 6px;
-    color: var(--ink-500);
-    font-size: 13px;
-    font-family: 'Cormorant Garamond', serif;
-    font-style: italic;
-    letter-spacing: .12em;
-  }
-  .sync-hint {
-    font-size: 12px;
-    color: var(--ink-500);
-    margin-top: 10px;
-    text-align: center;
-    line-height: 1.6;
-  }
-
   /* Toast */
   .toast {
     position: fixed;
@@ -2752,11 +2661,7 @@
     <button class="btn btn-primary" id="set-save">套用</button>
     <div style="height:10px;"></div>
     <button class="btn btn-secondary" id="set-load-sample">載入義大利 11 日範例行程</button>
-
-    <div class="sync-divider"><span>雲端同步 · Sync</span></div>
-    <div id="sync-section"></div>
-
-    <div style="height:14px;"></div>
+    <div style="height:10px;"></div>
     <button class="btn btn-danger" id="set-clear">清除全部資料</button>
   </div>
 </div>
@@ -2954,7 +2859,6 @@ let mapMode = 'today'; // 'today' or 'saved'
 
 function saveState() {
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {}
-  if (typeof pushSyncDebounced === 'function') pushSyncDebounced();
 }
 function loadState() {
   try {
@@ -3667,7 +3571,6 @@ document.querySelectorAll('#exp-mode-tabs .exp-mode-tab').forEach(t => {
 document.getElementById('settings-btn').addEventListener('click', () => {
   document.getElementById('set-start').value = state.trip.startDate;
   document.getElementById('set-days').value = state.trip.days;
-  renderSyncSection();
   openModal('set-modal');
 });
 document.getElementById('set-save').addEventListener('click', () => {
@@ -4945,231 +4848,6 @@ document.getElementById('day-range').addEventListener('input', (e) => {
 document.getElementById('day-prev').addEventListener('click', () => setDayByIndex(getCurrentDayIndex() - 1));
 document.getElementById('day-next').addEventListener('click', () => setDayByIndex(getCurrentDayIndex() + 1));
 
-/* ===== Cloud Sync (jsonblob.com) ===== */
-const SYNC_API = 'https://jsonblob.com/api/jsonBlob';
-let syncBlobId = localStorage.getItem('sync_blob_id') || null;
-let syncEnabled = !!syncBlobId;
-let syncStatus = 'idle';
-let lastSyncedAt = 0;
-let pollInterval = null;
-let pushTimer = null;
-let isApplyingRemote = false;
-
-const deviceId = (() => {
-  let id = localStorage.getItem('device_id');
-  if (!id) {
-    id = Math.random().toString(36).slice(2, 8) + Math.random().toString(36).slice(2, 6);
-    localStorage.setItem('device_id', id);
-  }
-  return id;
-})();
-
-function getSyncableState() {
-  const result = {};
-  Object.keys(state).forEach(k => {
-    if (!k.startsWith('_')) result[k] = state[k];
-  });
-  return result;
-}
-
-function setSyncStatus(status) {
-  syncStatus = status;
-  const indicator = document.getElementById('sync-status-indicator');
-  if (indicator) {
-    indicator.className = 'sync-indicator ' + status;
-    indicator.textContent = ({
-      idle: '未啟用',
-      connecting: '連線中…',
-      syncing: '同步中…',
-      synced: '已同步',
-      error: '同步錯誤'
-    })[status] || status;
-  }
-}
-
-async function createSyncRoom() {
-  setSyncStatus('connecting');
-  try {
-    const payload = getSyncableState();
-    payload._lastModified = Date.now();
-    payload._lastDevice = deviceId;
-    const resp = await fetch(SYNC_API, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-    const location = resp.headers.get('Location') || resp.headers.get('location') || '';
-    const id = location.split('/').filter(Boolean).pop();
-    if (!id) throw new Error('Invalid response');
-    syncBlobId = id;
-    syncEnabled = true;
-    lastSyncedAt = payload._lastModified;
-    localStorage.setItem('sync_blob_id', id);
-    startPolling();
-    setSyncStatus('synced');
-    renderSyncSection();
-    toast('已建立雲端同步房間');
-  } catch (e) {
-    setSyncStatus('error');
-    toast('建立失敗：' + e.message);
-  }
-}
-
-async function joinSyncRoom(id) {
-  if (!id) return;
-  id = id.trim().split('/').pop();
-  if (!id) { toast('請輸入有效的同步代碼'); return; }
-  setSyncStatus('connecting');
-  try {
-    const resp = await fetch(`${SYNC_API}/${id}`);
-    if (!resp.ok) throw new Error('找不到房間 (' + resp.status + ')');
-    const remote = await resp.json();
-    applyRemoteState(remote);
-    syncBlobId = id;
-    syncEnabled = true;
-    lastSyncedAt = remote._lastModified || Date.now();
-    localStorage.setItem('sync_blob_id', id);
-    startPolling();
-    setSyncStatus('synced');
-    renderSyncSection();
-    toast('已加入同步房間');
-    if (currentPage) showPage(currentPage);
-  } catch (e) {
-    setSyncStatus('error');
-    toast('加入失敗：' + e.message);
-  }
-}
-
-async function pullSync() {
-  if (!syncBlobId) return;
-  try {
-    const resp = await fetch(`${SYNC_API}/${syncBlobId}?_=${Date.now()}`);
-    if (!resp.ok) { setSyncStatus('error'); return; }
-    const remote = await resp.json();
-    if (remote._lastModified && remote._lastModified > lastSyncedAt && remote._lastDevice !== deviceId) {
-      applyRemoteState(remote);
-      lastSyncedAt = remote._lastModified;
-      if (currentPage) showPage(currentPage);
-      toast('已從其他裝置同步更新');
-    }
-    setSyncStatus('synced');
-  } catch (e) {
-    setSyncStatus('error');
-  }
-}
-
-function pushSyncDebounced() {
-  if (!syncEnabled || isApplyingRemote) return;
-  clearTimeout(pushTimer);
-  pushTimer = setTimeout(async () => {
-    try {
-      setSyncStatus('syncing');
-      const payload = getSyncableState();
-      payload._lastModified = Date.now();
-      payload._lastDevice = deviceId;
-      const resp = await fetch(`${SYNC_API}/${syncBlobId}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-      if (!resp.ok) { setSyncStatus('error'); return; }
-      lastSyncedAt = payload._lastModified;
-      setSyncStatus('synced');
-    } catch (e) {
-      setSyncStatus('error');
-    }
-  }, 1500);
-}
-
-function applyRemoteState(remote) {
-  isApplyingRemote = true;
-  try {
-    const flags = {};
-    Object.keys(state).forEach(k => { if (k.startsWith('_')) flags[k] = state[k]; });
-    const { _lastModified, _lastDevice, ...remoteData } = remote;
-    state = { ...remoteData, ...flags };
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {}
-  } finally {
-    isApplyingRemote = false;
-  }
-}
-
-function startPolling() {
-  stopPolling();
-  pullSync();
-  pollInterval = setInterval(pullSync, 10000);
-}
-function stopPolling() {
-  if (pollInterval) clearInterval(pollInterval);
-  pollInterval = null;
-}
-
-function disconnectSync() {
-  if (!confirm('確定要中斷雲端同步嗎？\n\n（資料會保留在本機，不會被刪除）')) return;
-  stopPolling();
-  syncEnabled = false;
-  syncBlobId = null;
-  localStorage.removeItem('sync_blob_id');
-  setSyncStatus('idle');
-  renderSyncSection();
-  toast('已中斷同步');
-}
-
-function renderSyncSection() {
-  const section = document.getElementById('sync-section');
-  if (!section) return;
-  if (syncEnabled && syncBlobId) {
-    section.innerHTML = `
-      <div class="sync-status-row">
-        <span class="sync-indicator ${syncStatus}" id="sync-status-indicator">${({idle:'未啟用',connecting:'連線中…',syncing:'同步中…',synced:'已同步',error:'同步錯誤'})[syncStatus]||syncStatus}</span>
-        <span class="device-id">本機 ID · ${escape(deviceId.slice(0, 6))}</span>
-      </div>
-      <div class="field">
-        <label>同步代碼 <span class="en">Sync Code</span></label>
-        <div class="sync-code-row">
-          <input type="text" value="${escape(syncBlobId)}" readonly id="sync-code-input" />
-          <button class="btn btn-secondary" onclick="copySyncCode()" style="width:auto; padding:12px 18px; flex:0 0 auto;">複製</button>
-        </div>
-      </div>
-      <button class="btn btn-secondary" onclick="manualSyncPull()" style="margin-top:6px;">立即拉取最新</button>
-      <button class="btn btn-danger" onclick="disconnectSync()" style="margin-top:8px;">中斷同步</button>
-      <div class="sync-hint">把同步代碼分享給旅伴<br>他們在「加入現有房間」貼上即可同步</div>
-    `;
-  } else {
-    section.innerHTML = `
-      <div class="sync-status-row">
-        <span class="sync-indicator ${syncStatus}" id="sync-status-indicator">${({idle:'未啟用',connecting:'連線中…',error:'同步錯誤'})[syncStatus]||'未啟用'}</span>
-        <span class="device-id">本機 ID · ${escape(deviceId.slice(0, 6))}</span>
-      </div>
-      <button class="btn btn-primary" onclick="createSyncRoom()">建立同步房間（你是房主）</button>
-      <div class="sync-or">— 或 —</div>
-      <div class="field">
-        <label>加入現有房間 <span class="en">Join</span></label>
-        <input type="text" id="sync-join-input" placeholder="貼上同步代碼" />
-      </div>
-      <button class="btn btn-secondary" onclick="joinSyncRoomFromInput()">加入</button>
-      <div class="sync-hint">建立房間後，把同步代碼分享給旅伴；<br>對方在這裡輸入即可即時同步行程、地圖、備用景點、筆記、支出。</div>
-    `;
-  }
-}
-
-window.createSyncRoom = createSyncRoom;
-window.disconnectSync = disconnectSync;
-window.joinSyncRoomFromInput = function() {
-  const id = document.getElementById('sync-join-input').value;
-  joinSyncRoom(id);
-};
-window.copySyncCode = function() {
-  const input = document.getElementById('sync-code-input');
-  input.select();
-  navigator.clipboard.writeText(input.value).then(() => toast('已複製同步代碼'));
-};
-window.manualSyncPull = function() {
-  pullSync();
-  toast('已拉取最新資料');
-};
-
 /* ===== Init ===== */
 function populateCitySelects() {
   const opts = CITY_LIST.map(([en,zh]) => `<option value="${en}">${en} ${zh}</option>`).join('');
@@ -5290,10 +4968,6 @@ function init() {
   setDateStripVisible(true); // home page shows date strip
   document.getElementById('fab').style.display = 'none';
   fetchRates().then(updateRateInfo);
-  // Start cloud sync if previously enabled
-  if (syncEnabled && syncBlobId) {
-    startPolling();
-  }
 }
 init();
 </script>
