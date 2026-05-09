@@ -78,7 +78,6 @@
     flex-direction: column;
     overflow: hidden;
     padding-top: var(--safe-top);
-    padding-bottom: var(--safe-bottom);
     box-sizing: border-box;
   }
   .app-header { flex-shrink: 0; }
@@ -738,7 +737,7 @@
     width: 100%;
     background: var(--oat-50);
     border-top: 1px solid var(--ink-100);
-    padding: 6px 4px 6px;
+    padding: 6px 4px max(6px, var(--safe-bottom));
     display: grid;
     grid-template-columns: repeat(5, 1fr);
     z-index: 100;
@@ -825,7 +824,7 @@
     max-width: 480px;
     background: var(--oat-50);
     border-radius: 24px 24px 0 0;
-    padding: 14px 24px 28px;
+    padding: 14px 24px calc(28px + var(--safe-bottom));
     max-height: var(--mvh, 85vh);
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
