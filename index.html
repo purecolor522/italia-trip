@@ -2749,12 +2749,12 @@ function buildSampleItinerary() {
   ];
   // Day 3 · 2026-05-17
   itineraries[day(2)] = [
-    { id: uid(), time: '08:00', place: '米蘭 → 威尼斯', city: 'Venezia', category: '車程', notes: '車程 271KM 約 3.5 小時' },
-    { id: uid(), time: '12:00', place: '汽船 → 聖馬可廣場', city: 'Venezia', category: '半日', notes: '歐洲會客廳' },
-    { id: uid(), time: '13:00', place: '玩家帶路品嚐當地美食', city: 'Venezia', category: '午餐', notes: '炸海鮮拼盤＋墨魚麵＋甜點' },
+    { id: uid(), time: '', place: '集合時間', city: 'Venezia', category: '集合' },
+    { id: uid(), time: '', place: '聖馬可廣場', city: 'Venezia', notes: '歐洲會客廳' },
     { id: uid(), time: '14:30', place: 'Basilica di San Marco 聖馬可大教堂', city: 'Venezia', duration: '1 小時', notes: '古典、羅馬、歌德、拜占庭融合' },
-    { id: uid(), time: '15:30', place: '嘆息橋 · 道奇宮', city: 'Venezia', duration: '1 小時', category: '必逛必吃', notes: '《情定日落橋》取景地' },
-    { id: uid(), time: '16:30', place: 'Gondola 鳳尾船', city: 'Venezia', duration: '40 分鐘', notes: '5 人一艘 · 享受運河風光' },
+    { id: uid(), time: '15:30', place: '嘆息橋 · 道奇宮', city: 'Venezia', duration: '1 小時', notes: '《情定日落橋》取景地' },
+    { id: uid(), time: '', place: 'Suso icecream 冰淇淋', city: 'Venezia', category: '必逛必吃' },
+    { id: uid(), time: '', place: '弗洛里安花神咖啡館 Caffè Florian', city: 'Venezia', category: '必逛必吃' },
     { id: uid(), time: '18:00', place: '自由活動 · 晚餐自理', city: 'Venezia', duration: '自由', notes: '可選購蕾莉歐等' },
   ];
   // Day 4 · 2026-05-18
@@ -2762,20 +2762,21 @@ function buildSampleItinerary() {
     { id: uid(), time: '09:00', place: '法拉利火車 / 歐洲之星', city: 'Bologna', category: '車程', notes: '威尼斯 → 波隆那（FRECCIA「箭」系列）約 1.5–2h' },
     { id: uid(), time: '11:00', place: 'Bologna 主廣場 + 雙塔', city: 'Bologna', duration: '1.5 小時', notes: '美食與文藝之都 · 著名地標' },
     { id: uid(), time: '13:00', place: '義式風味午餐', city: 'Bologna', category: '午餐' },
-    { id: uid(), time: '14:30', place: '波隆那 → 比薩', city: 'Pisa', category: '車程', notes: '車程 155KM 約 2 小時' },
-    { id: uid(), time: '17:00', place: '比薩斜塔', city: 'Pisa', duration: '1.5 小時', notes: '世界七大建築奇景之一 · 伽利略誕生地' },
+    { id: uid(), time: '14:00', place: '波隆那→比薩', city: 'Bologna', duration: '2 小時', category: '車程' },
+    { id: uid(), time: '15:00', place: '比薩斜塔', city: 'Pisa', duration: '1.5 小時', notes: '世界七大建築奇景之一 · 伽利略誕生地' },
     { id: uid(), time: '19:00', place: '義式風味晚餐', city: 'Pisa', category: '住宿', notes: '宿比薩 / 托斯卡納' },
   ];
   // Day 5 · 2026-05-19
   itineraries[day(4)] = [
     { id: uid(), time: '08:00', place: '飯店早餐', city: 'Pisa', category: '早餐', notes: '飯店內自助式早餐' },
     { id: uid(), time: '09:00', place: '比薩 → 聖吉米納諾', city: 'San Gimignano', category: '車程', notes: '車程 80KM 約 1.5 小時' },
-    { id: uid(), time: '10:30', place: 'San Gimignano 美麗塔樓之都', city: 'San Gimignano', duration: '1.5 小時', category: '必逛必吃', notes: '14 世紀保留至今 · 15 座貴族塔為中心 · 漫步石頭鋪成的小徑，遊覽托斯卡納之美' },
     { id: uid(), time: '12:00', place: '山城風味料理午餐', city: 'San Gimignano', category: '午餐', notes: '托斯卡納當地風味' },
+    { id: uid(), time: '10:30', place: 'San Gimignano 美麗塔樓之都', city: 'San Gimignano', duration: '1.5 小時', category: '自由活動', notes: '14 世紀保留至今 · 15 座貴族塔為中心 · 漫步石頭鋪成的小徑，遊覽托斯卡納之美' },
     { id: uid(), time: '13:30', place: '聖吉米納諾 → 佛羅倫斯', city: 'Firenze', category: '車程', notes: '車程 58KM 約 1 小時' },
-    { id: uid(), time: '15:00', place: 'Duomo 聖母百花大教堂', city: 'Firenze', duration: '1 小時', category: '必逛必吃', notes: '佛羅倫斯最著名地標 · 文藝復興發源地' },
+    { id: uid(), time: '15:00', place: 'Duomo 聖母百花大教堂', city: 'Firenze', duration: '1 小時', notes: '佛羅倫斯最著名地標 · 文藝復興發源地' },
     { id: uid(), time: '16:00', place: '天堂之門 · 但丁之家', city: 'Firenze', duration: '30 分鐘', notes: '下車參觀' },
-    { id: uid(), time: '16:30', place: '市政廳廣場 · 維奇歐宮 · 傭兵迴廊', city: 'Firenze', duration: '1 小時', category: '精品', notes: '領主廣場（領主科西摩廣場）· 烏菲茲美術館外觀 · 在此可選購佛羅倫斯皮件精品' },
+    { id: uid(), time: '16:30', place: '市政廳廣場 · 維奇歐宮 · 傭兵迴廊', city: 'Firenze', duration: '1 小時', notes: '領主廣場（領主科西摩廣場）· 烏菲茲美術館外觀 · 在此可選購佛羅倫斯皮件精品' },
+    { id: uid(), time: '17:00', place: 'Biffoli藥妝店？', city: 'Firenze', category: '必逛必吃' },
     { id: uid(), time: '17:30', place: '佛羅倫斯自由活動', city: 'Firenze', category: '自由活動', notes: '建議：\n• 小豬噴泉摸金豬許願（會重遊佛羅倫斯）\n• 維奇歐橋 Ponte Vecchio（電影《香水》取景）\n• 自費品嚐街頭美食「牛肚包」' },
     { id: uid(), time: '19:30', place: '托斯卡尼丁骨牛排晚餐', city: 'Firenze', category: '晚餐', notes: '附酒水' },
     { id: uid(), time: '21:00', place: '宿佛羅倫斯飯店', city: 'Firenze', category: '住宿' },
@@ -2790,19 +2791,18 @@ function buildSampleItinerary() {
   ];
   // Day 7 · 2026-05-21
   itineraries[day(6)] = [
-    { id: uid(), time: '08:00', place: '拿坡里 → 卡布里島', city: 'Capri', category: '船程', notes: '搭水翼快艇約 50 分鐘' },
-    { id: uid(), time: '09:30', place: '藍洞 Grotta Azzurra', city: 'Capri', duration: '1.5 小時', category: '必逛必吃', notes: '進入機率約三成 · 海象不佳將改替代方案（巴士抵藍洞站／半環島／聖米迦勒別墅／本島拿坡里皇宮）' },
+    { id: uid(), time: '08:00', place: '拿坡里 → 卡布里島', city: 'Capri', category: '船程', notes: '搭水翼快艇約 50 分鐘，要吃暈車藥' },
+    { id: uid(), time: '09:30', place: '藍洞 Grotta Azzurra', city: 'Capri', duration: '1.5 小時', notes: '進入機率約三成 · 海象不佳將改替代方案（巴士抵藍洞站／半環島／聖米迦勒別墅／本島拿坡里皇宮）' },
     { id: uid(), time: '12:00', place: '南義西式四道式午餐', city: 'Capri', category: '午餐' },
     { id: uid(), time: '14:00', place: '卡布里島 → 蘇連多', city: 'Sorrento', category: '船程', notes: '搭船約 20 分鐘' },
-    { id: uid(), time: '15:00', place: 'Positano 波西塔諾', city: 'Positano', duration: '1.5 小時', category: '必逛必吃', notes: '阿瑪菲海岸最美小鎮 · 特別安排小車進入' },
-    { id: uid(), time: '17:00', place: '阿瑪菲海岸線', city: 'Amalfi', duration: '1.5 小時', category: '必逛必吃', notes: '《托斯卡尼豔陽下》取景地' },
+    { id: uid(), time: '15:00', place: 'Positano 波西塔諾', city: 'Positano', duration: '1.5 小時', notes: '阿瑪菲海岸最美小鎮 · 特別安排小車進入，要吃暈車藥' },
+    { id: uid(), time: '17:00', place: '阿瑪菲海岸線', city: 'Amalfi', duration: '1.5 小時', notes: '《托斯卡尼豔陽下》取景地' },
     { id: uid(), time: '19:30', place: 'Gambero Rosso 紅蝦評鑑餐廳', city: 'Napoli', category: '住宿', notes: '主廚推薦 + 酒水 · 宿拿坡里（或南義濱海地區）' },
   ];
   // Day 8 · 2026-05-22
   itineraries[day(7)] = [
     { id: uid(), time: '09:00', place: '法拉利火車 / 歐洲之星', city: 'Roma', category: '車程', notes: '拿坡里 → 羅馬 約 1.5h（節省 3h 車程）' },
-    { id: uid(), time: '11:00', place: 'Vaticano 梵蒂岡博物館', city: 'Vaticano', duration: '2.5 小時', category: '必逛必吃', notes: '20+ 座美術館組成的藝術寶庫 · 創世紀' },
-    { id: uid(), time: '13:30', place: 'Cappella Sistina 西斯汀禮拜堂', city: 'Vaticano', duration: '1 小時', category: '必逛必吃', notes: '米開朗基羅最後的審判 · 附耳機接收器' },
+    { id: uid(), time: '11:00', place: 'Vaticano 梵蒂岡博物館', city: 'Vaticano', duration: '2.5 小時', notes: '20+ 座美術館組成的藝術寶庫：創世紀Cappella Sistina 西斯汀禮拜堂：最後的審判' },
     { id: uid(), time: '14:30', place: '中式七菜一湯午餐', city: 'Roma', category: '午餐' },
     { id: uid(), time: '16:00', place: 'Basilica di San Pietro 聖彼得大教堂', city: 'Vaticano', duration: '1.5 小時', notes: '入內參觀（免門票） · 米開朗基羅構想' },
     { id: uid(), time: '18:00', place: '台伯河', city: 'Roma', duration: '20 分鐘', notes: '行車遊覽' },
@@ -2810,12 +2810,12 @@ function buildSampleItinerary() {
   ];
   // Day 9 · 2026-05-23
   itineraries[day(8)] = [
-    { id: uid(), time: '09:00', place: 'Colosseo 圓形競技場', city: 'Roma', duration: '2 小時', category: '必逛必吃', notes: '世界七大奇景之一 · 入內參觀\n如預訂滿則改戶外拍照／古羅馬廢墟' },
+    { id: uid(), time: '09:00', place: 'Colosseo 圓形競技場', city: 'Roma', duration: '2 小時', notes: '世界七大奇景之一 · 入內參觀\n如預訂滿則改戶外拍照／古羅馬廢墟' },
     { id: uid(), time: '11:00', place: '君士坦丁凱旋門', city: 'Roma', duration: '20 分鐘', notes: '紀念君士坦丁一世' },
     { id: uid(), time: '12:30', place: '中式七菜一湯午餐', city: 'Roma', category: '午餐' },
-    { id: uid(), time: '14:00', place: 'Pantheon 萬神殿', city: 'Roma', duration: '40 分鐘', category: '必逛必吃', notes: 'AD118 哈德連皇帝所建' },
+    { id: uid(), time: '14:00', place: 'Pantheon 萬神殿', city: 'Roma', duration: '40 分鐘', notes: 'AD118 哈德連皇帝所建' },
     { id: uid(), time: '15:00', place: '金杯咖啡館', city: 'Roma', duration: '30 分鐘', category: '必逛必吃', notes: '《天使與魔鬼》羅馬最好喝咖啡 · 加碼贈送一杯' },
-    { id: uid(), time: '15:45', place: 'Fontana di Trevi 許願池', city: 'Roma', duration: '40 分鐘', category: '必逛必吃', notes: '投幣將會再返回羅馬' },
+    { id: uid(), time: '15:45', place: 'Fontana di Trevi 許願池', city: 'Roma', duration: '40 分鐘', notes: '投幣將會再返回羅馬' },
     { id: uid(), time: '16:30', place: 'Piazza di Spagna 西班牙廣場', city: 'Roma', duration: '1 小時', category: '精品', notes: '可自由選購名品' },
     { id: uid(), time: '19:00', place: '米其林推薦晚餐 + 酒水', city: 'Roma', category: '住宿', notes: '宿羅馬' },
   ];
@@ -2830,12 +2830,15 @@ function buildSampleItinerary() {
     { id: uid(), time: '16:10', place: '抵達桃園機場', city: 'Taoyuan', category: '入境', notes: '結束義大利深度之旅 · 平安回家' },
   ];
   const backups = [
-    { id: uid(), name: 'Luini PanZerotti 義大利餃子', city: 'Milano', date: '2026-05-16', notes: '1888 年開創的百年小吃店 · 米蘭道地小吃', pinColor: 'pink' },
-    { id: uid(), name: '三隻鹿冰淇淋 Le Tre Gazzelle', city: 'Milano', date: '2026-05-16', notes: '1954年成立', pinColor: 'pink' },
+    { id: uid(), name: 'Suso icecream 冰淇淋', city: 'Venezia', date: '2026-05-17', notes: '來自 05/17 行程', pinColor: 'pink' },
+    { id: uid(), name: '花神咖啡廳', city: 'Venezia', date: '2026-05-17', notes: '來自 05/17 行程', pinColor: 'pink' },
   ];
   const notebooks = {
-    '2026-05-15': '桃園機場好的地方',
     '2026-05-23': '隨筆',
+    '2026-05-16': '精品/藥局',
+    '2026-05-18': '比薩斜塔要入內嗎\n火車都是搭兩小時',
+    '2026-05-19': '聖吉米娜諾必買：松露\n佛羅倫斯必買：皮件',
+    '2026-05-21': '要吃暈車藥‼️‼️',
   };
   return { itineraries, backups, notebooks };
 }
