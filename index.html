@@ -2743,7 +2743,8 @@ function buildSampleItinerary() {
     { id: uid(), time: '15:30', place: 'Duomo di Milano 米蘭大教堂', city: 'Milano', notes: '世界第三大教堂 · 徐志摩稱「大理石的詩篇」', duration: '1.5 小時', category: '必逛必吃' },
     { id: uid(), time: '17:00', place: '艾曼紐二世紀念迴廊', city: 'Milano', notes: '十字形拱廊 · 米蘭最熱鬧地區 · LV/Prada 精品大道', duration: '1 小時', category: '精品' },
     { id: uid(), time: '18:00', place: '斯卡拉歌劇院', city: 'Milano', notes: '下車參觀', duration: '20 分鐘' },
-    { id: uid(), time: '18:30', place: 'Luini · 三隻鹿冰淇淋', city: 'Milano', notes: '自由活動 · Luini PanZerotti（1888 年百年小吃）／三隻鹿冰淇淋（1954）', category: '必逛必吃' },
+    { id: uid(), time: '18:30', place: 'Luini PanZerotti 義大利餃子', city: 'Milano', notes: '1888 年開創的百年小吃店 · 米蘭道地小吃', category: '必逛必吃' },
+    { id: uid(), time: '18:45', place: '三隻鹿冰淇淋', city: 'Milano', notes: '1954 年成立 · 米蘭最推薦的冰淇淋 (Le Tre Gazzelle)', category: '必逛必吃' },
     { id: uid(), time: '20:00', place: '義式風味晚餐', city: 'Milano', notes: '宿米蘭', duration: '住宿' },
   ];
   // Day 3 · 5/17 米蘭 → 威尼斯
@@ -3041,7 +3042,7 @@ function renderItinerary() {
         </button>
         <div class="top-row">
           ${(() => {
-            const showTime = item.category === '航班' || item.category === '入境';
+            const showTime = TIME_DISPLAY_CATEGORIES.has(item.category);
             const hasBlock = showTime || (item.duration && item.duration.trim());
             if (!hasBlock) return '';
             return `
@@ -3362,6 +3363,7 @@ function populateDurationSelect() {
 
 const CATEGORIES = ['必逛必吃','精品','集合','航班','出境','入境','車程','船程','住宿','自由活動','早餐','午餐','晚餐','半日','全日'];
 const PINK_CATEGORIES = new Set(['必逛必吃', '精品']);
+const TIME_DISPLAY_CATEGORIES = new Set(['航班', '入境', '集合', '車程']);
 
 function populateCategorySelect() {
   const sel = document.getElementById('itin-category');
@@ -4515,7 +4517,7 @@ function renderHome() {
       preview.innerHTML = `<div class="empty">這天還沒有行程，去看看 →</div>`;
     } else {
       preview.innerHTML = items.slice(0, 3).map(it => {
-        const showTime = it.category === '航班' || it.category === '入境';
+        const showTime = TIME_DISPLAY_CATEGORIES.has(it.category);
         const tDisplay = showTime ? (it.time || '—') : '·';
         const tClass = showTime && it.time ? '' : 'no-t';
         return `
@@ -4930,6 +4932,34 @@ function populateBkDateSelect() {
   }).join('');
 }
 
+function migrateDay2Panzerotti() {
+  if (state._d2_panzerotti_v1) return;
+  const start = new Date(state.trip.startDate);
+  start.setDate(start.getDate() + 1);
+  const day2 = start.toISOString().slice(0, 10);
+  const arr = state.itineraries[day2];
+  if (arr) {
+    const existsPanzerotti = arr.some(item => item.place && item.place.includes('PanZerotti'));
+    if (!existsPanzerotti) {
+      const newItem = {
+        id: uid(),
+        time: '18:30',
+        place: 'Luini PanZerotti 義大利餃子',
+        city: 'Milano',
+        category: '必逛必吃',
+        notes: '1888 年開創的百年小吃店 · 米蘭道地小吃'
+      };
+      let pos = arr.length;
+      for (let i = 0; i < arr.length; i++) {
+        if (!arr[i].time || arr[i].time > '18:30') { pos = i; break; }
+      }
+      arr.splice(pos, 0, newItem);
+    }
+  }
+  state._d2_panzerotti_v1 = true;
+  saveState();
+}
+
 function migrateDay1HSRAndNotes() {
   if (state._d1_hsr_v1) return;
   const day1 = state.trip.startDate;
@@ -5086,6 +5116,7 @@ function init() {
   migrateDay5();
   migrateDay1Day11Cities();
   migrateDay1HSRAndNotes();
+  migrateDay2Panzerotti();
   const dates = genDates();
   if (!dates.find(d => d.iso === currentDate)) currentDate = dates[0].iso;
   renderDateStrip();
