@@ -52,12 +52,13 @@
     font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
     background: var(--oat-100);
     color: var(--ink-900);
-    font-size: 15px;
+    font-size: 17px;
+    font-weight: 500;
     line-height: 1.6;
     letter-spacing: 0.01em;
     -webkit-font-smoothing: antialiased;
   }
-  h1, h2, h3, .serif { font-family: 'Noto Serif TC', serif; font-weight: 500; letter-spacing: .03em; }
+  h1, h2, h3, .serif { font-family: 'Noto Serif TC', serif; font-weight: 600; letter-spacing: .03em; }
   .script { font-family: 'Caveat', cursive; }
   button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; padding: 0; }
   input, textarea, select { font-family: inherit; font-size: 15px; color: var(--ink-900); }
@@ -99,9 +100,10 @@
     letter-spacing: .14em;
   }
   .header-title h1 {
-    font-size: 24px;
+    font-size: 28px;
     margin: 0;
     color: var(--ink-900);
+    font-weight: 700;
   }
   .header-title h1 small {
     font-family: 'Caveat', cursive;
@@ -199,10 +201,10 @@
   }
   .section-label .zh {
     font-family: 'Noto Serif TC', serif;
-    font-size: 17px;
+    font-size: 19px;
     color: var(--ink-900);
     letter-spacing: .06em;
-    font-weight: 500;
+    font-weight: 700;
   }
   .section-label .en {
     font-family: 'Cormorant Garamond', serif;
@@ -240,10 +242,10 @@
   }
   .hero-title {
     font-family: 'Noto Serif TC', serif;
-    font-size: 26px;
+    font-size: 30px;
     margin: 4px 0 10px;
     color: var(--ink-900);
-    font-weight: 500;
+    font-weight: 700;
   }
   .hero-title .it {
     font-family: 'Cormorant Garamond', serif;
@@ -325,39 +327,43 @@
   }
   .today-card .head .ttl {
     font-family: 'Noto Serif TC', serif;
-    font-size: 15px;
+    font-size: 17px;
     color: var(--ink-900);
     display: flex; align-items: center; gap: 8px;
+    font-weight: 700;
   }
   .today-card .head .more {
-    font-size: 12px;
+    font-size: 14px;
     color: var(--tan-500);
     display: flex; align-items: center; gap: 3px;
+    font-weight: 600;
   }
   .today-card .preview-item {
     display: flex; align-items: flex-start; gap: 12px;
-    padding: 8px 0;
+    padding: 10px 0;
     border-bottom: 1px dashed var(--ink-100);
   }
   .today-card .preview-item:last-child { border-bottom: none; }
   .today-card .preview-item .t {
     font-family: 'Cormorant Garamond', serif;
-    font-size: 16px;
+    font-size: 18px;
     color: var(--tan-600);
-    min-width: 50px;
-    font-weight: 500;
+    min-width: 56px;
+    font-weight: 600;
   }
   .today-card .preview-item .t.no-t { color: var(--ink-300); }
   .today-card .preview-item .p {
     flex: 1;
-    font-size: 14px;
+    font-size: 16px;
     color: var(--ink-900);
+    font-weight: 600;
   }
   .today-card .preview-item .p .city {
     display: block;
-    font-size: 11px;
+    font-size: 13px;
     color: var(--ink-500);
     margin-top: 2px;
+    font-weight: 500;
   }
   .today-card .empty {
     text-align: center;
@@ -414,13 +420,15 @@
   }
   .feature-card .fc-title {
     font-family: 'Noto Serif TC', serif;
-    font-size: 16px;
+    font-size: 18px;
     color: var(--ink-900);
     margin: 0;
+    font-weight: 700;
   }
   .feature-card .fc-desc {
-    font-size: 12px;
+    font-size: 13px;
     color: var(--ink-500);
+    font-weight: 500;
   }
   .feature-card .fc-en {
     font-family: 'Caveat', cursive;
@@ -555,24 +563,24 @@
   .itin-card .time-block { display: flex; flex-direction: column; min-width: 56px; }
   .itin-card .time {
     font-family: 'Cormorant Garamond', serif;
-    font-size: 22px;
+    font-size: 26px;
     color: var(--ink-900);
     line-height: 1;
-    font-weight: 500;
+    font-weight: 600;
   }
   .itin-card .time.no-time {
     color: var(--ink-300);
     font-size: 18px;
   }
-  .itin-card .duration { font-size: 11px; color: var(--ink-500); margin-top: 4px; letter-spacing: .04em; }
+  .itin-card .duration { font-size: 13px; color: var(--ink-500); margin-top: 4px; letter-spacing: .04em; font-weight: 500; }
   .itin-card .body { flex: 1; min-width: 0; }
   .itin-card .place {
     font-family: 'Noto Serif TC', serif;
-    font-size: 16px;
+    font-size: 18px;
     color: var(--ink-900);
     margin: 0 0 4px;
     word-break: break-word;
-    font-weight: 500;
+    font-weight: 700;
   }
   .itin-card .tag-row {
     display: flex;
@@ -586,12 +594,12 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    font-size: 12px;
-    padding: 0 14px;
-    height: 24px;
+    font-size: 14px;
+    padding: 0 16px;
+    height: 28px;
     border-radius: 999px;
     line-height: 1;
-    font-weight: 500;
+    font-weight: 600;
     box-sizing: border-box;
   }
   .itin-card .city-tag {
@@ -603,13 +611,14 @@
     background: rgba(200, 116, 92, .14);
   }
   .itin-card .notes {
-    font-size: 13px;
+    font-size: 15px;
     color: var(--ink-700);
-    line-height: 1.6;
+    line-height: 1.65;
     white-space: pre-wrap;
     margin-top: 6px;
     padding-top: 8px;
     border-top: 1px dashed var(--ink-100);
+    font-weight: 500;
   }
   .itin-card .weather-pill {
     display: inline-flex; align-items: center; gap: 4px;
@@ -625,15 +634,16 @@
   .itin-card .actions { display: flex; gap: 6px; margin-top: 10px; }
   .itin-card .ghost-btn {
     flex: 1;
-    padding: 8px 6px;
+    padding: 10px 6px;
     border-radius: 10px;
     background: var(--oat-100);
     color: var(--ink-700);
-    font-size: 12px;
+    font-size: 14px;
+    font-weight: 600;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 3px;
+    gap: 4px;
     white-space: nowrap;
   }
   .itin-card .ghost-btn:active { background: var(--oat-200); }
@@ -693,7 +703,7 @@
   }
   .nav-item svg { width: 22px; height: 22px; }
   .nav-item .label {
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 700;
     font-family: 'Noto Serif TC', serif;
     letter-spacing: .04em;
@@ -738,7 +748,7 @@
     color: var(--ink-900);
     font-weight: 800;
     margin-top: -16px;
-    font-size: 13px;
+    font-size: 14px;
     letter-spacing: .04em;
   }
   .nav-home.active .home-bubble {
@@ -794,7 +804,7 @@
     border-radius: 2px;
     margin: 0 auto 12px;
   }
-  .modal h2 { font-size: 18px; margin: 0 0 4px; }
+  .modal h2 { font-size: 22px; margin: 0 0 6px; font-weight: 700; }
   .modal h2 .en {
     font-family: 'Cormorant Garamond', serif;
     font-style: italic;
@@ -803,15 +813,15 @@
     margin-left: 8px;
     letter-spacing: .1em;
   }
-  .modal .modal-sub { color: var(--ink-500); font-size: 12px; margin-bottom: 18px; }
+  .modal .modal-sub { color: var(--ink-500); font-size: 14px; margin-bottom: 18px; font-weight: 500; }
 
   /* Form */
   .field { margin-bottom: 14px; }
-  .field label { display: block; font-size: 12px; color: var(--ink-500); margin-bottom: 6px; letter-spacing: .05em; }
+  .field label { display: block; font-size: 14px; color: var(--ink-500); margin-bottom: 6px; letter-spacing: .05em; font-weight: 600; }
   .field label .en { font-family: 'Cormorant Garamond', serif; font-style: italic; margin-left: 6px; color: var(--ink-300); }
   .field input, .field select, .field textarea {
     width: 100%;
-    padding: 12px 14px;
+    padding: 13px 14px;
     border: 1px solid var(--ink-100);
     border-radius: 12px;
     background: var(--oat-50);
@@ -820,6 +830,8 @@
     -webkit-appearance: none;
     appearance: none;
     font-family: inherit;
+    font-size: 16px;
+    font-weight: 500;
   }
   .field input[type="date"] {
     text-align: left;
@@ -855,10 +867,10 @@
 
   .btn {
     width: 100%;
-    padding: 14px;
+    padding: 15px;
     border-radius: 14px;
-    font-size: 15px;
-    font-weight: 500;
+    font-size: 17px;
+    font-weight: 700;
     transition: transform .12s ease, opacity .12s ease;
     display: inline-flex;
     align-items: center;
@@ -1117,13 +1129,13 @@
   }
   .summary-card .total-twd {
     font-family: 'Cormorant Garamond', serif;
-    font-size: 36px;
-    font-weight: 500;
+    font-size: 42px;
+    font-weight: 700;
     color: var(--ink-900);
     line-height: 1;
   }
-  .summary-card .total-twd .currency { font-size: 14px; color: var(--ink-500); margin-right: 4px; letter-spacing: .1em; }
-  .summary-card .total-eur { font-size: 13px; color: var(--ink-500); margin-top: 6px; font-family: 'Cormorant Garamond', serif; }
+  .summary-card .total-twd .currency { font-size: 16px; color: var(--ink-500); margin-right: 4px; letter-spacing: .1em; font-weight: 600; }
+  .summary-card .total-eur { font-size: 15px; color: var(--ink-500); margin-top: 6px; font-family: 'Cormorant Garamond', serif; font-weight: 500; }
   .summary-card .coin-illust { position: absolute; right: 14px; bottom: 8px; width: 64px; opacity: .55; }
 
   .converter {
@@ -1171,12 +1183,13 @@
   .expense-list { display: flex; flex-direction: column; gap: 8px; }
   .expense-day-group { margin-top: 16px; }
   .expense-day-label {
-    font-size: 12px; color: var(--ink-500);
+    font-size: 14px; color: var(--ink-500);
     margin-bottom: 8px;
     display: flex; justify-content: space-between;
     padding: 0 4px;
+    font-weight: 600;
   }
-  .expense-day-label .day-total { font-family: 'Cormorant Garamond', serif; color: var(--ink-700); }
+  .expense-day-label .day-total { font-family: 'Cormorant Garamond', serif; color: var(--ink-700); font-size: 15px; }
   .expense-card-wrap {
     position: relative;
     overflow: hidden;
@@ -1213,11 +1226,11 @@
   }
   .expense-card .cat-icon svg { width: 18px; height: 18px; color: var(--ink-700); }
   .expense-card .e-info { min-width: 0; flex: 1; }
-  .expense-card .e-note { font-size: 14px; color: var(--ink-900); margin-bottom: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .expense-card .e-cat { font-size: 11px; color: var(--ink-500); }
+  .expense-card .e-note { font-size: 16px; font-weight: 600; color: var(--ink-900); margin-bottom: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .expense-card .e-cat { font-size: 13px; color: var(--ink-500); font-weight: 500; }
   .expense-card .e-amt { font-family: 'Cormorant Garamond', serif; text-align: right; flex: 0 0 auto; }
-  .expense-card .e-amt .twd { font-size: 16px; color: var(--ink-900); font-weight: 500; }
-  .expense-card .e-amt .for { font-size: 11px; color: var(--ink-500); font-style: italic; }
+  .expense-card .e-amt .twd { font-size: 18px; color: var(--ink-900); font-weight: 600; }
+  .expense-card .e-amt .for { font-size: 13px; color: var(--ink-500); font-style: italic; font-weight: 500; }
 
   /* Backup */
   .backup-list { display: flex; flex-direction: column; gap: 12px; }
@@ -1298,9 +1311,9 @@
     box-shadow: var(--shadow-soft);
     border: 1px solid rgba(217, 200, 164, .5);
   }
-  .backup-card .name { font-family: 'Noto Serif TC', serif; font-size: 16px; color: var(--ink-900); margin-bottom: 4px; font-weight: 500; }
+  .backup-card .name { font-family: 'Noto Serif TC', serif; font-size: 18px; color: var(--ink-900); margin-bottom: 4px; font-weight: 700; }
   .backup-card .city { font-size: 12px; color: var(--tan-600); font-family: 'Cormorant Garamond', serif; font-style: italic; letter-spacing: .1em; margin-bottom: 8px; }
-  .backup-card .notes { font-size: 13px; color: var(--ink-700); line-height: 1.55; white-space: pre-wrap; }
+  .backup-card .notes { font-size: 15px; color: var(--ink-700); line-height: 1.6; white-space: pre-wrap; font-weight: 500; }
   .backup-card .actions { display: flex; gap: 6px; margin-top: 12px; flex-wrap: wrap; }
   .backup-card .ghost-btn {
     padding: 8px 12px;
@@ -1316,12 +1329,12 @@
   /* Pill */
   .pill-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
   .pill {
-    padding: 10px 18px;
+    padding: 11px 20px;
     border-radius: 999px;
     background: var(--oat-100);
     color: var(--ink-700);
-    font-size: 15px;
-    font-weight: 500;
+    font-size: 16px;
+    font-weight: 700;
     border: 1px solid transparent;
     font-family: 'Noto Serif TC', serif;
     letter-spacing: .04em;
@@ -1660,12 +1673,12 @@
   }
   .exp-mode-tab {
     flex: 1;
-    padding: 8px 12px;
+    padding: 10px 12px;
     border-radius: 999px;
-    font-size: 13px;
+    font-size: 15px;
     color: var(--ink-700);
     font-family: 'Noto Serif TC', serif;
-    font-weight: 500;
+    font-weight: 600;
     transition: all .2s ease;
     display: flex; align-items: center; justify-content: center; gap: 6px;
   }
@@ -1683,14 +1696,14 @@
   .add-expense-btn {
     width: 100%;
     margin: 14px 0 0;
-    padding: 12px 16px;
+    padding: 14px 16px;
     border-radius: 14px;
     background: var(--ink-900);
     color: var(--oat-100);
     display: flex; align-items: center; justify-content: center; gap: 6px;
-    font-size: 14px;
+    font-size: 16px;
     font-family: 'Noto Serif TC', serif;
-    font-weight: 500;
+    font-weight: 700;
     box-shadow: var(--shadow-soft);
   }
   .add-expense-btn:active { transform: scale(.98); }
@@ -2860,7 +2873,7 @@ function renderItinerary() {
         <div class="top-row">
           <div class="time-block">
             <div class="time ${item.time ? '' : 'no-time'}">${item.time || '—'}</div>
-            <div class="duration">${escape(item.duration || (item.time ? '' : '全天'))}</div>
+            <div class="duration">${escape(item.duration || '')}</div>
           </div>
           <div class="body">
             <div class="place">${escape(item.place)}</div>
@@ -3397,10 +3410,12 @@ document.getElementById('itin-delete').addEventListener('click', () => { if (con
 function initMapIfNeeded() {
   if (map) { map.invalidateSize(); return; }
   map = L.map('map', { zoomControl: true, attributionControl: false }).setView([42.5, 12.5], 6);
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-    maxZoom: 19, attribution: '© OpenStreetMap, © CartoDB'
+  L.tileLayer('https://mt{s}.google.com/vt/lyrs=m&hl=zh-TW&x={x}&y={y}&z={z}', {
+    maxZoom: 20,
+    subdomains: ['0', '1', '2', '3'],
+    attribution: '© Google'
   }).addTo(map);
-  L.control.attribution({ prefix: false }).addAttribution('© OSM').addTo(map);
+  L.control.attribution({ prefix: false }).addAttribution('© Google Maps').addTo(map);
 }
 function clearMapPins() {
   mapMarkers.forEach(m => map.removeLayer(m));
