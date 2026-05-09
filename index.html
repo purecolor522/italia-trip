@@ -3574,13 +3574,13 @@ window.restoreHiddenMapPins = function() {
 };
 
 window.removeSavedFromMap = function(id) {
-  if (!confirm('要從收藏中刪除此景點嗎？\n\n（僅移除地圖上的紅色釘子，不會影響你的行程卡片）')) return;
+  if (!confirm('要從地圖中刪除此景點嗎？\n\n（僅移除地圖上的圖標，不會影響你的行程卡片）')) return;
   // Only remove from backups, never touch itineraries
   state.backups = (state.backups || []).filter(b => b.id !== id);
   saveState();
   if (map) map.closePopup();
   renderMapPins();
-  toast('已從收藏中移除');
+  toast('已從地圖中移除');
 };
 
 window.addItinToMap = function(id) {
