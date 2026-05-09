@@ -1817,6 +1817,12 @@
     transition: transform .12s ease;
   }
   .notebook-card-mini:active { transform: scale(.99); }
+  .notebook-card-mini.empty {
+    background: var(--oat-50);
+    border: 1.5px dashed var(--ink-300);
+    box-shadow: none;
+  }
+  .notebook-card-mini.empty::before { opacity: .25; }
   .notebook-card-mini::before {
     content: '';
     position: absolute;
@@ -2886,6 +2892,7 @@ function renderDateStrip() {
       if (currentPage === 'home') renderHome();
       if (currentPage === 'itinerary') renderItinerary();
       if (currentPage === 'map') renderMapPins();
+      if (currentPage === 'backup') renderBackups();
       if (currentPage === 'expenses' && expenseMode === 'daily') renderExpenses();
       chip.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
     });
@@ -3445,8 +3452,8 @@ function showPage(name) {
   // Show FAB only on itinerary and backup (expenses has its own visible "新增支出" button)
   const showFab = ['itinerary','backup'].includes(name);
   fab.style.display = showFab ? 'grid' : 'none';
-  // Date strip on home, itinerary, map, and expenses-daily mode
-  setDateStripVisible(name === 'home' || name === 'itinerary' || name === 'map' || (name === 'expenses' && expenseMode === 'daily'));
+  // Date strip on home, itinerary, map, backup, and expenses-daily mode
+  setDateStripVisible(name === 'home' || name === 'itinerary' || name === 'map' || name === 'backup' || (name === 'expenses' && expenseMode === 'daily'));
   if (name === 'home') renderHome();
   else if (name === 'map') { setTimeout(() => { initMapIfNeeded(); renderMapPins(); }, 50); }
   else if (name === 'expenses') renderExpenses();
@@ -4136,36 +4143,45 @@ function renderBackups() {
 function renderNotebookList() {
   const section = document.getElementById('notebook-list-section');
   if (!section) return;
-  const entries = Object.entries(state.notebooks || {})
-    .filter(([_, c]) => c && c.trim())
-    .sort(([a], [b]) => a.localeCompare(b));
-  if (entries.length === 0) { section.innerHTML = ''; return; }
-
   const dates = genDates();
+  const idx = dates.findIndex(d => d.iso === currentDate);
+  const dateObj = new Date(currentDate);
+  const dow = ['日','一','二','三','四','五','六'][dateObj.getDay()];
+  const dayLabel = idx >= 0 ? `D${idx + 1}` : '';
+  const dateLabel = `${dateObj.getMonth()+1}/${dateObj.getDate()} 週${dow}`;
+  const content = (state.notebooks && state.notebooks[currentDate]) || '';
+
   let html = `
     <div class="section-label" style="margin-top: 22px;">
       <span class="zh">旅行筆記</span>
-      <span class="en">Notebooks · ${entries.length}</span>
+      <span class="en">${dayLabel} · ${dateLabel}</span>
     </div>
-    <div class="notebook-grid">
   `;
-  entries.forEach(([date, content]) => {
-    const idx = dates.findIndex(d => d.iso === date);
-    const dateObj = new Date(date);
-    const dow = ['日','一','二','三','四','五','六'][dateObj.getDay()];
-    const dayLabel = idx >= 0 ? `D${idx + 1}` : '';
-    const dateLabel = `${dateObj.getMonth()+1}/${dateObj.getDate()} 週${dow}`;
+  if (content && content.trim()) {
     html += `
-      <div class="notebook-card-mini" onclick="openNotebookModal('${date}')">
-        <div class="nb-date">
-          <span class="nb-label">${dayLabel ? `<span class="day-num">${dayLabel}</span>` : ''}${dateLabel}</span>
-          <span class="nb-edit-icon">EDIT ›</span>
+      <div class="notebook-grid">
+        <div class="notebook-card-mini" onclick="openNotebookModal('${currentDate}')">
+          <div class="nb-date">
+            <span class="nb-label">${dayLabel ? `<span class="day-num">${dayLabel}</span>` : ''}${dateLabel}</span>
+            <span class="nb-edit-icon">EDIT ›</span>
+          </div>
+          <div class="nb-text">${escape(content)}</div>
         </div>
-        <div class="nb-text">${escape(content)}</div>
       </div>
     `;
-  });
-  html += '</div>';
+  } else {
+    html += `
+      <div class="notebook-grid">
+        <div class="notebook-card-mini empty" onclick="openNotebookModal('${currentDate}')">
+          <div class="nb-date">
+            <span class="nb-label">${dayLabel ? `<span class="day-num">${dayLabel}</span>` : ''}${dateLabel}</span>
+            <span class="nb-edit-icon">+ 新增</span>
+          </div>
+          <div class="nb-text" style="color: var(--ink-300); font-style: italic;">尚無筆記 · 點擊撰寫今日心得</div>
+        </div>
+      </div>
+    `;
+  }
   section.innerHTML = html;
 }
 window.addBkToItin = function(id) {
@@ -4752,6 +4768,7 @@ function setDayByIndex(idx) {
   if (currentPage === 'home') renderHome();
   if (currentPage === 'itinerary') renderItinerary();
   if (currentPage === 'map') renderMapPins();
+  if (currentPage === 'backup') renderBackups();
   if (currentPage === 'expenses' && expenseMode === 'daily') renderExpenses();
   updateDaySlider();
 }
