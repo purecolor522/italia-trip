@@ -2335,7 +2335,7 @@
     <section class="page" id="page-backup">
       <div class="section-label">
         <span class="zh">備用景點</span>
-        <span class="en">Saved Spots</span>
+        <span class="en" id="backup-day-label">Saved Spots</span>
       </div>
       <div class="backup-list" id="backup-list"></div>
       <div id="notebook-list-section"></div>
@@ -2473,8 +2473,13 @@
     <h2 id="bk-modal-title">新增備用景點<span class="en">Saved</span></h2>
     <div class="modal-sub">先收藏起來，有空再去</div>
     <div class="field"><label>景點名稱 <span class="en">Name</span></label><input type="text" id="bk-name" placeholder="例: Galleria Borghese" /></div>
-    <div class="field"><label>城市 <span class="en">City</span></label>
-      <select id="bk-city"></select>
+    <div class="field-row">
+      <div class="field"><label>城市 <span class="en">City</span></label>
+        <select id="bk-city"></select>
+      </div>
+      <div class="field"><label>哪一天 <span class="en">Day</span></label>
+        <select id="bk-date"></select>
+      </div>
     </div>
     <div class="field"><label>備註 <span class="en">Notes</span></label><textarea id="bk-notes" placeholder="這裡有什麼吸引你？"></textarea></div>
     <div class="btn-row" id="bk-edit-row" style="display:none;">
@@ -3606,7 +3611,7 @@ async function renderMapPins() {
   if (!map) return;
   clearMapPins();
 
-  const savedItems = (state.backups || []).slice();
+  const savedItems = (state.backups || []).filter(b => (b.date || state.trip.startDate) === currentDate);
 
   document.getElementById('map-pin-count').textContent = `${savedItems.length} 處`;
   document.getElementById('map-city').textContent = '--';
@@ -3700,6 +3705,7 @@ window.addItinToMap = function(id) {
     id: uid(),
     name: item.place,
     city: item.city,
+    date: currentDate,
     notes: item.notes || `來自 ${currentDate.slice(5).replace('-','/')} 行程`,
     pinColor: PINK_CATEGORIES.has(item.category) ? 'pink' : 'black'
   });
@@ -3752,7 +3758,7 @@ document.getElementById('map-refresh').addEventListener('click', () => { renderM
 function renderPinListDropdown() {
   const dropdown = document.getElementById('pin-list-dropdown');
   if (!dropdown) return;
-  const savedItems = state.backups || [];
+  const savedItems = (state.backups || []).filter(b => (b.date || state.trip.startDate) === currentDate);
 
   let html = '';
   if (savedItems.length > 0) {
@@ -4096,7 +4102,17 @@ document.getElementById('exp-delete').addEventListener('click', () => {
 /* ===== Backup ===== */
 function renderBackups() {
   const list = document.getElementById('backup-list');
-  if (!state.backups.length) {
+  const dayBackups = (state.backups || []).filter(b => (b.date || state.trip.startDate) === currentDate);
+  // Update section sub label
+  const labelEl = document.getElementById('backup-day-label');
+  if (labelEl) {
+    const dates = genDates();
+    const idx = dates.findIndex(d => d.iso === currentDate);
+    const dateObj = new Date(currentDate);
+    const dow = ['日','一','二','三','四','五','六'][dateObj.getDay()];
+    labelEl.textContent = `${idx >= 0 ? `D${idx+1} · ` : ''}${dateObj.getMonth()+1}/${dateObj.getDate()} 週${dow}`;
+  }
+  if (!dayBackups.length) {
     list.innerHTML = `<div class="empty-state">
       <svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
         <ellipse cx="40" cy="70" rx="20" ry="3" fill="rgba(135,98,56,.12)"/>
@@ -4105,12 +4121,13 @@ function renderBackups() {
         <path d="M40 42 C 32 36 26 32 26 26 C 26 22 30 20 34 22 C 36 23 38 25 40 28 C 42 25 44 23 46 22 C 50 20 54 22 54 26 C 54 32 48 36 40 42 Z" fill="#C8745C"/>
         <path d="M40 42 C 32 36 26 32 26 26 C 26 22 30 20 34 22 C 36 23 38 25 40 28 C 42 25 44 23 46 22 C 50 20 54 22 54 26 C 54 32 48 36 40 42 Z" class="ink-stroke" stroke-width="1.6"/>
       </svg>
-      <div class="zh">把想去的地方收藏起來</div>
-      <div class="en">No saved spots yet</div>
+      <div class="zh">這天還沒有備用景點</div>
+      <div class="en">No saved spots for this day</div>
     </div>`;
+    renderNotebookList();
     return;
   }
-  list.innerHTML = state.backups.map(b => `
+  list.innerHTML = dayBackups.map(b => `
     <div class="backup-card-wrap">
       <button class="swipe-delete-btn" onclick="confirmDeleteBackup('${b.id}')" aria-label="刪除">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
@@ -4321,6 +4338,10 @@ function setupSwipeOnBackupCards() {
 window.viewBkOnMap = function(id) {
   const b = state.backups.find(x => x.id === id);
   if (!b) return;
+  if (b.date && b.date !== currentDate) {
+    currentDate = b.date;
+    renderDateStrip();
+  }
   showPage('map');
   setTimeout(async () => {
     const c = await geocodeItem({ place: b.name, city: b.city, id: b.id });
@@ -4341,6 +4362,7 @@ window.editBk = function(id) {
   document.getElementById('bk-modal-title').innerHTML = '編輯景點<span class="en">Edit</span>';
   document.getElementById('bk-name').value = b.name;
   document.getElementById('bk-city').value = b.city;
+  document.getElementById('bk-date').value = b.date || currentDate;
   document.getElementById('bk-notes').value = b.notes || '';
   document.getElementById('bk-save').style.display = 'none';
   document.getElementById('bk-edit-row').style.display = 'grid';
@@ -4351,6 +4373,7 @@ function openBkModal() {
   document.getElementById('bk-modal-title').innerHTML = '新增備用景點<span class="en">Saved</span>';
   document.getElementById('bk-name').value = '';
   document.getElementById('bk-city').value = 'Roma';
+  document.getElementById('bk-date').value = currentDate;
   document.getElementById('bk-notes').value = '';
   document.getElementById('bk-save').style.display = 'flex';
   document.getElementById('bk-edit-row').style.display = 'none';
@@ -4359,7 +4382,15 @@ function openBkModal() {
 function saveBk() {
   const name = document.getElementById('bk-name').value.trim();
   if (!name) { toast('請輸入景點名稱'); return; }
-  const b = { id: editingBkId || uid(), name, city: document.getElementById('bk-city').value, notes: document.getElementById('bk-notes').value.trim() };
+  const existing = editingBkId ? state.backups.find(x => x.id === editingBkId) : null;
+  const b = {
+    id: editingBkId || uid(),
+    name,
+    city: document.getElementById('bk-city').value,
+    date: document.getElementById('bk-date').value || currentDate,
+    notes: document.getElementById('bk-notes').value.trim(),
+    pinColor: existing ? existing.pinColor : 'black'
+  };
   if (editingBkId) {
     const idx = state.backups.findIndex(x => x.id === editingBkId);
     if (idx >= 0) state.backups[idx] = b;
@@ -4369,6 +4400,7 @@ function saveBk() {
   saveState();
   closeModal('bk-modal');
   renderBackups();
+  if (currentPage === 'map') renderMapPins();
   toast('已儲存');
 }
 document.getElementById('bk-save').addEventListener('click', saveBk);
@@ -4798,6 +4830,27 @@ function populateCitySelects() {
   document.getElementById('bk-city').innerHTML = opts;
 }
 
+function populateBkDateSelect() {
+  const sel = document.getElementById('bk-date');
+  const dates = genDates();
+  sel.innerHTML = dates.map((d, i) => {
+    const dateObj = new Date(d.iso);
+    const dow = ['日','一','二','三','四','五','六'][dateObj.getDay()];
+    return `<option value="${d.iso}">D${i+1} · ${dateObj.getMonth()+1}/${dateObj.getDate()} (週${dow})</option>`;
+  }).join('');
+}
+
+function migrateBackupsAddDate() {
+  if (state._backups_with_date_v1) return;
+  if (Array.isArray(state.backups)) {
+    state.backups.forEach(b => {
+      if (!b.date) b.date = state.trip.startDate;
+    });
+  }
+  state._backups_with_date_v1 = true;
+  saveState();
+}
+
 function applyPinkCategoriesFromSample() {
   if (localStorage.getItem('italia_pink_v1') === '1') return;
   Object.keys(state.itineraries || {}).forEach(date => {
@@ -4873,10 +4926,12 @@ function migrateDurationToCategory() {
 
 function init() {
   populateCitySelects();
+  populateBkDateSelect();
   populateTimeSelects();
   populateDurationSelect();
   populateCategorySelect();
   clearOnlySavedPinsOnce();
+  migrateBackupsAddDate();
   applyPinkCategoriesFromSample();
   migrateDurationToCategory();
   migrateTaipeiToTaiwan();
