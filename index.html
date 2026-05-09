@@ -2733,7 +2733,8 @@ function buildSampleItinerary() {
   const itineraries = {};
   // Day 1 · 5/15 桃園 → 杜拜
   itineraries[day(0)] = [
-    { id: uid(), time: '20:05', place: '桃園機場第二航廈集合', city: 'Dubai', notes: '阿聯酋航空櫃台 · 領隊：黃博榮 0920-077-877\n團號：AASEK1160515MXP（巨匠旅遊-綠色）', category: '集合' },
+    { id: uid(), time: '17:45', place: '高鐵670車次', city: 'Taiwan', notes: '', category: '車程' },
+    { id: uid(), time: '20:05', place: '桃園機場第二航廈集合', city: 'Dubai', notes: '阿聯酋航空櫃台 · 領隊：黃博榮 0920-077-877', category: '集合' },
     { id: uid(), time: '23:05', place: 'EK367 桃園 → 杜拜', city: 'Dubai', notes: '航行 9h30m · 抵達 04:35+1\n夜宿機上', category: '航班' },
   ];
   // Day 2 · 5/16 杜拜 → 米蘭
@@ -4917,6 +4918,40 @@ function populateBkDateSelect() {
   }).join('');
 }
 
+function migrateDay1HSRAndNotes() {
+  if (state._d1_hsr_v1) return;
+  const day1 = state.trip.startDate;
+  const arr = state.itineraries[day1];
+  if (arr) {
+    const hasHSR = arr.some(item => item.place && item.place.includes('高鐵670'));
+    if (!hasHSR) {
+      const hsrItem = {
+        id: uid(),
+        time: '17:45',
+        place: '高鐵670車次',
+        city: 'Taiwan',
+        category: '車程',
+        notes: ''
+      };
+      let pos = arr.length;
+      for (let i = 0; i < arr.length; i++) {
+        if (!arr[i].time || arr[i].time > '17:45') { pos = i; break; }
+      }
+      arr.splice(pos, 0, hsrItem);
+    }
+    const meetingItem = arr.find(item => item.place === '桃園機場第二航廈集合');
+    if (meetingItem && meetingItem.notes && meetingItem.notes.includes('團號')) {
+      meetingItem.notes = meetingItem.notes
+        .split('\n')
+        .filter(line => !line.includes('團號'))
+        .join('\n')
+        .trim();
+    }
+  }
+  state._d1_hsr_v1 = true;
+  saveState();
+}
+
 function migrateDay1Day11Cities() {
   if (state._d1d11_cities_v1) return;
   const start = new Date(state.trip.startDate);
@@ -5038,6 +5073,7 @@ function init() {
   migrateTaipeiToTaiwan();
   migrateDay5();
   migrateDay1Day11Cities();
+  migrateDay1HSRAndNotes();
   const dates = genDates();
   if (!dates.find(d => d.iso === currentDate)) currentDate = dates[0].iso;
   renderDateStrip();
