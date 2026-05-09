@@ -3040,10 +3040,17 @@ function renderItinerary() {
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
         </button>
         <div class="top-row">
-          <div class="time-block">
-            <div class="time ${item.time ? '' : 'no-time'}">${item.time || '—'}</div>
-            <div class="duration">${escape(item.duration || '')}</div>
-          </div>
+          ${(() => {
+            const showTime = item.category === '航班' || item.category === '入境';
+            const hasBlock = showTime || (item.duration && item.duration.trim());
+            if (!hasBlock) return '';
+            return `
+              <div class="time-block">
+                ${showTime ? `<div class="time ${item.time ? '' : 'no-time'}">${item.time || '—'}</div>` : ''}
+                ${item.duration ? `<div class="duration">${escape(item.duration)}</div>` : ''}
+              </div>
+            `;
+          })()}
           <div class="body">
             <div class="place">${escape(item.place)}</div>
             <div class="tag-row">
@@ -4507,12 +4514,17 @@ function renderHome() {
     if (items.length === 0) {
       preview.innerHTML = `<div class="empty">這天還沒有行程，去看看 →</div>`;
     } else {
-      preview.innerHTML = items.slice(0, 3).map(it => `
-        <div class="preview-item">
-          <span class="t ${it.time ? '' : 'no-t'}">${it.time || '—'}</span>
-          <div class="p">${escape(it.place)}<span class="city">${escape((CITY_COORDS[it.city]||{}).zh || it.city)}${it.duration ? ' · ' + escape(it.duration) : ''}</span></div>
-        </div>
-      `).join('') + (items.length > 3 ? `<div class="empty" style="padding:6px 0;">還有 ${items.length - 3} 個行程</div>` : '');
+      preview.innerHTML = items.slice(0, 3).map(it => {
+        const showTime = it.category === '航班' || it.category === '入境';
+        const tDisplay = showTime ? (it.time || '—') : '·';
+        const tClass = showTime && it.time ? '' : 'no-t';
+        return `
+          <div class="preview-item">
+            <span class="t ${tClass}">${tDisplay}</span>
+            <div class="p">${escape(it.place)}<span class="city">${escape((CITY_COORDS[it.city]||{}).zh || it.city)}${it.duration ? ' · ' + escape(it.duration) : ''}</span></div>
+          </div>
+        `;
+      }).join('') + (items.length > 3 ? `<div class="empty" style="padding:6px 0;">還有 ${items.length - 3} 個行程</div>` : '');
     }
   }
 }
