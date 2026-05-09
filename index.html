@@ -248,11 +248,14 @@
     font-weight: 700;
   }
   .hero-title .it {
+    display: block;
     font-family: 'Cormorant Garamond', serif;
     font-style: italic;
     font-size: 18px;
     color: var(--tan-500);
-    margin-left: 6px;
+    margin-top: 4px;
+    margin-left: 0;
+    font-weight: 500;
   }
   .hero-row {
     display: flex; gap: 14px; align-items: center;
@@ -537,6 +540,42 @@
   .itin-card.must {
     background: linear-gradient(135deg, #FBE4D8 0%, #F7DBCD 100%);
     border-color: rgba(200, 116, 92, .28);
+  }
+  /* Check button at top-right */
+  .itin-card .itin-check-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: var(--oat-100);
+    border: 2px solid var(--ink-300);
+    display: grid;
+    place-items: center;
+    color: transparent;
+    transition: all .18s ease;
+    z-index: 3;
+    cursor: pointer;
+  }
+  .itin-card .itin-check-btn svg { width: 16px; height: 16px; }
+  .itin-card .itin-check-btn:active { transform: scale(.9); }
+  .itin-card .itin-check-btn.checked {
+    background: var(--accent-sage);
+    border-color: var(--accent-sage);
+    color: var(--oat-100);
+  }
+  .itin-card .body { padding-right: 36px; }
+  .itin-card.completed { opacity: 0.65; }
+  .itin-card.completed .place {
+    text-decoration: line-through;
+    text-decoration-color: var(--ink-300);
+    text-decoration-thickness: 2px;
+    color: var(--ink-500);
+  }
+  .itin-card.completed .notes,
+  .itin-card.completed .duration {
+    color: var(--ink-300);
   }
   .itin-card.must .notes {
     border-top-color: rgba(200, 116, 92, .22);
@@ -1922,21 +1961,20 @@
         <h2 class="hero-title">義大利出發囉！<span class="it">11 giorni in Italia</span></h2>
         <div class="hero-row">
           <div class="hero-illust">
-            <!-- Pin + dashed trail + small airplane silhouette -->
-            <svg viewBox="0 0 140 100" xmlns="http://www.w3.org/2000/svg">
-              <!-- Location pin (left side) -->
-              <g transform="translate(28 50)">
+            <!-- Small pin + dashed trail + LARGE airplane silhouette -->
+            <svg viewBox="0 0 140 110" xmlns="http://www.w3.org/2000/svg">
+              <!-- Smaller pin (top-left) -->
+              <g transform="translate(18 38) scale(0.55)">
                 <path d="M0 8 C -12 0 -14 -8 -14 -14 C -14 -22 -8 -28 0 -28 C 8 -28 14 -22 14 -14 C 14 -8 12 0 0 8 Z"
                       fill="#876238"/>
                 <circle cx="0" cy="-14" r="5" fill="#FAF6EC"/>
-                <circle cx="0" cy="14" r="2" fill="#876238"/>
               </g>
-              <!-- Dashed S-curve trail from pin to plane -->
-              <path d="M28 64 C 38 92 64 92 76 68 C 86 48 100 32 114 50"
+              <!-- Dashed S-curve trail -->
+              <path d="M18 48 C 30 78 56 84 70 64 C 82 48 92 36 104 50"
                     fill="none" stroke="#876238" stroke-width="2.4"
                     stroke-dasharray="3 5" stroke-linecap="round"/>
-              <!-- Small filled airplane silhouette pointing upper-right -->
-              <g transform="translate(118 46) rotate(40)">
+              <!-- Bigger airplane silhouette -->
+              <g transform="translate(108 52) rotate(40) scale(2)">
                 <path d="M0 -14 L 2 -8 L 2 -2 L 14 4 L 14 7 L 2 5 L 2 9 L 6 13 L 6 14 L 0 12 L -6 14 L -6 13 L -2 9 L -2 5 L -14 7 L -14 4 L -2 -2 L -2 -8 Z"
                       fill="#876238"/>
               </g>
@@ -2869,7 +2907,10 @@ function renderItinerary() {
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
           <span>刪除</span>
         </button>
-      <div class="itin-card${item.category === '必逛必吃' ? ' must' : ''}" data-id="${item.id}">
+      <div class="itin-card${PINK_CATEGORIES.has(item.category) ? ' must' : ''}${item.completed ? ' completed' : ''}" data-id="${item.id}">
+        <button class="itin-check-btn ${item.completed ? 'checked' : ''}" onclick="event.stopPropagation(); toggleItinComplete('${item.id}')" aria-label="完成">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </button>
         <div class="top-row">
           <div class="time-block">
             <div class="time ${item.time ? '' : 'no-time'}">${item.time || '—'}</div>
@@ -2931,6 +2972,17 @@ window.navigateTo = function(id) {
   if (!item) return;
   const q = encodeURIComponent(`${item.place}, ${item.city}, Italy`);
   window.open(`https://www.google.com/maps/dir/?api=1&destination=${q}`, '_blank');
+};
+
+window.toggleItinComplete = function(id) {
+  const items = state.itineraries[currentDate] || [];
+  const item = items.find(i => i.id === id);
+  if (!item) return;
+  item.completed = !item.completed;
+  saveState();
+  renderItinerary();
+  if (currentPage === 'home') renderHome();
+  toast(item.completed ? '✓ 已完成' : '已取消');
 };
 
 window.confirmDeleteItin = function(id) {
@@ -3173,7 +3225,8 @@ function populateDurationSelect() {
   sel.innerHTML = html;
 }
 
-const CATEGORIES = ['必逛必吃','集合','航班','出境','入境','車程','船程','住宿','自由活動','早餐','午餐','晚餐','半日','全日'];
+const CATEGORIES = ['必逛必吃','精品','集合','航班','出境','入境','車程','船程','住宿','自由活動','早餐','午餐','晚餐','半日','全日'];
+const PINK_CATEGORIES = new Set(['必逛必吃', '精品']);
 
 function populateCategorySelect() {
   const sel = document.getElementById('itin-category');
@@ -4624,6 +4677,16 @@ function populateCitySelects() {
   document.getElementById('bk-city').innerHTML = opts;
 }
 
+function clearAllMapPinsOnce() {
+  // One-time clear of all itinerary pins and saved spots
+  if (localStorage.getItem('italia_pins_cleared_v1') === '1') return;
+  state.itineraries = {};
+  state.backups = [];
+  state.hiddenFromMap = {};
+  saveState();
+  localStorage.setItem('italia_pins_cleared_v1', '1');
+}
+
 function migrateTaipeiToTaiwan() {
   if (state._taiwanMigrated) return;
   let changed = false;
@@ -4672,6 +4735,7 @@ function init() {
   populateTimeSelects();
   populateDurationSelect();
   populateCategorySelect();
+  clearAllMapPinsOnce();
   migrateDurationToCategory();
   migrateTaipeiToTaiwan();
   migrateDay5();
