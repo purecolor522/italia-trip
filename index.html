@@ -1358,6 +1358,17 @@
   .backup-card .name { font-family: 'Noto Serif TC', serif; font-size: 18px; color: var(--ink-900); margin-bottom: 4px; font-weight: 700; }
   .backup-card .city { font-size: 12px; color: var(--tan-600); font-family: 'Cormorant Garamond', serif; font-style: italic; letter-spacing: .1em; margin-bottom: 8px; }
   .backup-card .notes { font-size: 15px; color: var(--ink-700); line-height: 1.6; white-space: pre-wrap; font-weight: 500; }
+  .backup-card .hidden-badge {
+    display: inline-block;
+    font-size: 11px;
+    color: var(--ink-500);
+    background: var(--oat-200);
+    padding: 3px 10px;
+    border-radius: 999px;
+    margin-bottom: 8px;
+    font-weight: 500;
+    letter-spacing: .04em;
+  }
   .backup-card .actions { display: flex; gap: 6px; margin-top: 12px; flex-wrap: wrap; }
   .backup-card .ghost-btn {
     padding: 8px 12px;
@@ -3611,7 +3622,7 @@ async function renderMapPins() {
   if (!map) return;
   clearMapPins();
 
-  const savedItems = (state.backups || []).filter(b => (b.date || state.trip.startDate) === currentDate);
+  const savedItems = (state.backups || []).filter(b => (b.date || state.trip.startDate) === currentDate && !b.hiddenFromMap);
 
   document.getElementById('map-pin-count').textContent = `${savedItems.length} 處`;
   document.getElementById('map-city').textContent = '--';
@@ -3683,13 +3694,16 @@ window.restoreHiddenMapPins = function() {
 };
 
 window.removeSavedFromMap = function(id) {
-  if (!confirm('要從地圖中刪除此景點嗎？\n\n（僅移除地圖上的圖標，不會影響你的行程卡片）')) return;
-  // Only remove from backups, never touch itineraries
-  state.backups = (state.backups || []).filter(b => b.id !== id);
-  saveState();
+  if (!confirm('要從地圖中移除此圖標嗎？\n\n（備用景點卡片仍會保留，只是地圖上不顯示）')) return;
+  // Mark backup as hidden from map; do NOT delete the backup itself
+  const b = (state.backups || []).find(x => x.id === id);
+  if (b) {
+    b.hiddenFromMap = true;
+    saveState();
+  }
   if (map) map.closePopup();
   renderMapPins();
-  toast('已從地圖中移除');
+  toast('已從地圖移除（備用景點仍保留）');
 };
 
 window.addItinToMap = function(id) {
@@ -3758,7 +3772,7 @@ document.getElementById('map-refresh').addEventListener('click', () => { renderM
 function renderPinListDropdown() {
   const dropdown = document.getElementById('pin-list-dropdown');
   if (!dropdown) return;
-  const savedItems = (state.backups || []).filter(b => (b.date || state.trip.startDate) === currentDate);
+  const savedItems = (state.backups || []).filter(b => (b.date || state.trip.startDate) === currentDate && !b.hiddenFromMap);
 
   let html = '';
   if (savedItems.length > 0) {
@@ -4136,6 +4150,7 @@ function renderBackups() {
       <div class="backup-card" data-id="${b.id}">
         <div class="name">${escape(b.name)}</div>
         <div class="city">${escape((CITY_COORDS[b.city]||{}).zh || b.city)} · ${escape(b.city)}</div>
+        ${b.hiddenFromMap ? '<div class="hidden-badge">📍 已從地圖隱藏</div>' : ''}
         ${b.notes ? `<div class="notes">${escape(b.notes)}</div>` : ''}
         <div class="actions">
           <button class="ghost-btn" onclick="openAddToDaySheet('${b.id}')">
@@ -4338,6 +4353,10 @@ function setupSwipeOnBackupCards() {
 window.viewBkOnMap = function(id) {
   const b = state.backups.find(x => x.id === id);
   if (!b) return;
+  if (b.hiddenFromMap) {
+    b.hiddenFromMap = false;
+    saveState();
+  }
   if (b.date && b.date !== currentDate) {
     currentDate = b.date;
     renderDateStrip();
