@@ -281,19 +281,17 @@
   }
   .hero-info .day-num {
     font-family: 'Noto Serif TC', serif;
-    font-size: 17px;
-    color: var(--ink-700);
+    font-size: 18px;
+    color: var(--ink-900);
     margin: 4px 0 2px;
     display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 2px;
+    align-items: baseline;
+    gap: 14px;
     font-weight: 600;
   }
   .hero-info .day-num .big {
     font-family: 'Cormorant Garamond', serif;
     font-size: 30px;
-    margin-right: 0;
     font-weight: 700;
     color: var(--ink-900);
     line-height: 1;
@@ -2153,12 +2151,8 @@
     <section class="page" id="page-map">
       <div class="map-legend">
         <div class="legend-item">
-          <span class="legend-pin black"></span>
-          <span>今日行程</span>
-        </div>
-        <div class="legend-item">
           <span class="legend-pin red"></span>
-          <span>我的收藏</span>
+          <span>已加入地圖（行程卡點「加入地圖」）</span>
         </div>
       </div>
       <div id="map-container">
@@ -2172,10 +2166,10 @@
       </div>
       <div class="trip-info-row">
         <button class="item dropdown-trigger" id="map-pin-dropdown-btn" type="button">
-          <span class="lab">行程 + 收藏
+          <span class="lab">已加入地點
             <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
           </span>
-          <span class="val" id="map-pin-count">0 + 0</span>
+          <span class="val" id="map-pin-count">0 處</span>
         </button>
         <div class="item"><span class="lab">CITY</span><span class="val" id="map-city">--</span></div>
         <div class="item"><span class="lab">YOU</span><span class="val" id="map-loc-status">未取得</span></div>
@@ -3486,61 +3480,20 @@ async function renderMapPins() {
   if (!map) return;
   clearMapPins();
 
-  const hidden = new Set((state.hiddenFromMap && state.hiddenFromMap[currentDate]) || []);
-  const todayItems = (state.itineraries[currentDate] || []).slice().filter(it => !hidden.has(it.id));
   const savedItems = (state.backups || []).slice();
 
-  // Update restore button visibility
-  const restoreBtn = document.getElementById('map-restore-btn');
-  if (restoreBtn) {
-    const hiddenCount = ((state.hiddenFromMap && state.hiddenFromMap[currentDate]) || []).length;
-    if (hiddenCount > 0) {
-      restoreBtn.style.display = 'inline-flex';
-      document.getElementById('map-hidden-count').textContent = hiddenCount;
-    } else {
-      restoreBtn.style.display = 'none';
-    }
-  }
-  const totalCount = todayItems.length + savedItems.length;
-  document.getElementById('map-pin-count').textContent = `${todayItems.length} + ${savedItems.length}`;
-  document.getElementById('map-city').textContent = todayItems.length
-    ? (CITY_COORDS[mostCommonCity(todayItems)]?.zh || '--')
-    : '--';
+  document.getElementById('map-pin-count').textContent = `${savedItems.length} 處`;
+  document.getElementById('map-city').textContent = '--';
 
-  if (totalCount === 0) { map.setView([42.5, 12.5], 6); return; }
+  // Hide restore button (no longer relevant)
+  const restoreBtn = document.getElementById('map-restore-btn');
+  if (restoreBtn) restoreBtn.style.display = 'none';
+
+  if (savedItems.length === 0) { map.setView([42.5, 12.5], 6); return; }
 
   const bounds = [];
-  let counter = 1;
 
-  // Today's pins (black, numbered)
-  for (const item of todayItems) {
-    let coord = await geocodeItem(item);
-    if (!coord) continue;
-    const html = `<div class="map-pin"><span>${counter}</span></div>`;
-    const icon = L.divIcon({ html, className: '', iconSize: [32, 40], iconAnchor: [16, 38] });
-    const marker = L.marker([coord.lat, coord.lng], { icon }).addTo(map);
-    const meta = `${escape(item.time || '')} · ${escape((CITY_COORDS[item.city]||{}).zh || item.city)}`;
-    const popupHtml = `
-      <div class="popup-title">${escape(item.place)}</div>
-      <div class="popup-meta">${meta}</div>
-      <div class="popup-actions">
-        <a class="popup-btn" href="https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(item.place + ', ' + item.city + ', Italy')}" target="_blank" rel="noopener">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
-          導航
-        </a>
-        <button class="popup-btn danger" onclick="hideItinFromMap('${item.id}')">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
-          從地圖移除
-        </button>
-      </div>`;
-    marker.bindPopup(popupHtml);
-    mapMarkers.push(marker);
-    mapMarkerById[item.id] = { marker, coord: [coord.lat, coord.lng], type: 'today' };
-    bounds.push([coord.lat, coord.lng]);
-    counter++;
-  }
-
-  // Saved pins (red, ★)
+  // Saved pins (red, ★) — only items user manually added via 「加入地圖」
   for (const b of savedItems) {
     const item = { id: b.id, place: b.name, city: b.city, notes: b.notes };
     let coord = await geocodeItem(item);
@@ -3671,26 +3624,11 @@ document.getElementById('map-refresh').addEventListener('click', () => { renderM
 function renderPinListDropdown() {
   const dropdown = document.getElementById('pin-list-dropdown');
   if (!dropdown) return;
-  const hidden = new Set((state.hiddenFromMap && state.hiddenFromMap[currentDate]) || []);
-  const todayItems = (state.itineraries[currentDate] || []).slice().filter(it => !hidden.has(it.id));
   const savedItems = state.backups || [];
 
   let html = '';
-  if (todayItems.length > 0) {
-    html += '<div class="pin-list-section"><h5>今日行程</h5>';
-    todayItems.forEach((it, i) => {
-      html += `
-        <button class="pin-list-item" type="button" onclick="flyToPin('${it.id}')">
-          <span class="pin-num">${i + 1}</span>
-          <span class="pin-name">${escape(it.place)}</span>
-          <span class="pin-time">${escape(it.time || '—')}</span>
-        </button>
-      `;
-    });
-    html += '</div>';
-  }
   if (savedItems.length > 0) {
-    html += '<div class="pin-list-section"><h5>我的收藏</h5>';
+    html += '<div class="pin-list-section"><h5>已加入地圖</h5>';
     savedItems.forEach(b => {
       html += `
         <button class="pin-list-item" type="button" onclick="flyToPin('${b.id}')">
@@ -3702,7 +3640,7 @@ function renderPinListDropdown() {
     });
     html += '</div>';
   }
-  if (!html) html = '<div class="pin-list-empty">尚無地點可顯示</div>';
+  if (!html) html = '<div class="pin-list-empty">尚無地點 · 從行程卡點「加入地圖」</div>';
   dropdown.innerHTML = html;
 }
 
