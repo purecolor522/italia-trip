@@ -2151,8 +2151,12 @@
     <section class="page" id="page-map">
       <div class="map-legend">
         <div class="legend-item">
+          <span class="legend-pin black"></span>
+          <span>一般行程</span>
+        </div>
+        <div class="legend-item">
           <span class="legend-pin red"></span>
-          <span>已加入地圖（行程卡點「加入地圖」）</span>
+          <span>必逛必吃／精品</span>
         </div>
       </div>
       <div id="map-container">
@@ -3493,12 +3497,13 @@ async function renderMapPins() {
 
   const bounds = [];
 
-  // Saved pins (red, ★) — only items user manually added via 「加入地圖」
+  // Saved pins — color depends on b.pinColor
   for (const b of savedItems) {
     const item = { id: b.id, place: b.name, city: b.city, notes: b.notes };
     let coord = await geocodeItem(item);
     if (!coord) continue;
-    const html = `<div class="map-pin saved"><span>★</span></div>`;
+    const colorClass = b.pinColor === 'pink' ? 'saved' : '';
+    const html = `<div class="map-pin ${colorClass}"><span>★</span></div>`;
     const icon = L.divIcon({ html, className: '', iconSize: [32, 40], iconAnchor: [16, 38] });
     const marker = L.marker([coord.lat, coord.lng], { icon }).addTo(map);
     const meta = `${escape((CITY_COORDS[item.city]||{}).zh || item.city)}${item.notes ? ' · ' + escape(item.notes.slice(0, 40)) : ''}`;
@@ -3565,7 +3570,7 @@ window.addItinToMap = function(id) {
   if (!item) return;
   const exists = (state.backups || []).find(b => b.name === item.place && b.city === item.city);
   if (exists) {
-    toast('此地點已在收藏中');
+    toast('此地點已在地圖上');
     return;
   }
   state.backups = state.backups || [];
@@ -3573,10 +3578,11 @@ window.addItinToMap = function(id) {
     id: uid(),
     name: item.place,
     city: item.city,
-    notes: item.notes || `來自 ${currentDate.slice(5).replace('-','/')} 行程`
+    notes: item.notes || `來自 ${currentDate.slice(5).replace('-','/')} 行程`,
+    pinColor: PINK_CATEGORIES.has(item.category) ? 'pink' : 'black'
   });
   saveState();
-  toast('已加入地圖收藏');
+  toast(PINK_CATEGORIES.has(item.category) ? '已加入地圖（粉色 pin）' : '已加入地圖（黑色 pin）');
 };
 const geocodeCache = {};
 async function geocodeItem(item) {
@@ -3630,9 +3636,10 @@ function renderPinListDropdown() {
   if (savedItems.length > 0) {
     html += '<div class="pin-list-section"><h5>已加入地圖</h5>';
     savedItems.forEach(b => {
+      const colorClass = b.pinColor === 'pink' ? 'saved' : '';
       html += `
         <button class="pin-list-item" type="button" onclick="flyToPin('${b.id}')">
-          <span class="pin-num saved">★</span>
+          <span class="pin-num ${colorClass}">★</span>
           <span class="pin-name">${escape(b.name)}</span>
           <span class="pin-time">${escape((CITY_COORDS[b.city]||{}).zh || b.city)}</span>
         </button>
