@@ -3618,20 +3618,46 @@ document.getElementById('set-clear').addEventListener('click', () => {
   location.reload();
 });
 
-document.getElementById('set-export').addEventListener('click', () => {
+async function doExport() {
   const data = JSON.stringify(state, null, 2);
-  const blob = new Blob([data], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
   const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
-  a.download = `italia-trip-${dateStr}.json`;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  setTimeout(() => URL.revokeObjectURL(url), 100);
-  toast('已匯出備份檔');
-});
+  const filename = `italia-trip-${dateStr}.json`;
+  // Try Web Share API first (best for iOS/Android PWA)
+  if (navigator.canShare && navigator.share) {
+    try {
+      const file = new File([data], filename, { type: 'application/json' });
+      if (navigator.canShare({ files: [file] })) {
+        await navigator.share({ files: [file], title: '義大利行程備份' });
+        toast('已分享備份檔');
+        return;
+      }
+    } catch (err) {
+      if (err.name === 'AbortError') return; // user cancelled
+    }
+  }
+  // Fallback: classic download link
+  try {
+    const blob = new Blob([data], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 100);
+    toast('已匯出備份檔');
+    return;
+  } catch (e) {}
+  // Last resort: copy to clipboard
+  try {
+    await navigator.clipboard.writeText(data);
+    toast('已複製到剪貼簿（請貼到 LINE/Email 自己）');
+  } catch (e) {
+    alert('無法匯出，請手動複製此文字：\n\n' + data);
+  }
+}
+document.getElementById('set-export').addEventListener('click', doExport);
 
 document.getElementById('set-import').addEventListener('click', () => {
   document.getElementById('import-file-input').click();
