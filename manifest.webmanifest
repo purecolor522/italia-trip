@@ -1,0 +1,28 @@
+{
+  "name": "義大利遊記",
+  "short_name": "Italia",
+  "description": "義大利 11 天旅行手冊：行程、地圖、記帳、備用景點、筆記",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F2EBD8",
+  "theme_color": "#F2EBD8",
+  "lang": "zh-TW",
+  "dir": "ltr",
+  "categories": ["travel", "lifestyle"],
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-maskable.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ]
+}
