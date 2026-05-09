@@ -4677,14 +4677,19 @@ function populateCitySelects() {
   document.getElementById('bk-city').innerHTML = opts;
 }
 
-function clearAllMapPinsOnce() {
-  // One-time clear of all itinerary pins and saved spots
-  if (localStorage.getItem('italia_pins_cleared_v1') === '1') return;
-  state.itineraries = {};
+function clearOnlySavedPinsOnce() {
+  // Restore itineraries if they were previously cleared by mistake; only keep saved spots empty
+  if (localStorage.getItem('italia_pins_fix_v2') === '1') return;
+  const totalItems = Object.values(state.itineraries || {}).reduce((sum, arr) => sum + (Array.isArray(arr) ? arr.length : 0), 0);
+  if (totalItems === 0) {
+    // Restore itineraries from sample (only if empty — won't overwrite user's data)
+    state.itineraries = JSON.parse(JSON.stringify(SAMPLE_DATA.itineraries));
+  }
+  // Clear only saved spots (red pins on map), keep all itineraries
   state.backups = [];
   state.hiddenFromMap = {};
   saveState();
-  localStorage.setItem('italia_pins_cleared_v1', '1');
+  localStorage.setItem('italia_pins_fix_v2', '1');
 }
 
 function migrateTaipeiToTaiwan() {
@@ -4735,7 +4740,7 @@ function init() {
   populateTimeSelects();
   populateDurationSelect();
   populateCategorySelect();
-  clearAllMapPinsOnce();
+  clearOnlySavedPinsOnce();
   migrateDurationToCategory();
   migrateTaipeiToTaiwan();
   migrateDay5();
