@@ -2418,13 +2418,13 @@
     <div class="modal-handle"></div>
     <h2>新增<span class="en">Add</span></h2>
     <div class="modal-sub">選擇要新增的內容</div>
-    <button class="action-row" id="action-add-itin">
-      <div class="action-icon">
+    <button class="action-row" id="action-add-primary">
+      <div class="action-icon" id="action-primary-icon">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M12 14v4M10 16h4"/></svg>
       </div>
       <div class="action-body">
-        <div class="action-title">新增行程</div>
-        <div class="action-desc">時間、地點、停留與備註</div>
+        <div class="action-title" id="action-primary-title">新增行程</div>
+        <div class="action-desc" id="action-primary-desc">時間、地點、停留與備註</div>
       </div>
       <svg class="action-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
     </button>
@@ -3393,15 +3393,35 @@ window.showPage = showPage;
 
 document.querySelectorAll('.nav-item').forEach(n => n.addEventListener('click', () => showPage(n.dataset.page)));
 
+let actionSheetContext = 'itinerary';
+
+const ACTION_ICONS = {
+  itinerary: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M12 14v4M10 16h4"/></svg>',
+  backup: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/><path d="M9 11l2 2 4-4"/></svg>'
+};
+
+function openAddActionSheet(context) {
+  actionSheetContext = context;
+  const config = {
+    itinerary: { title: '新增行程', desc: '時間、地點、停留與備註' },
+    backup: { title: '新增備用景點', desc: '收藏想去的地方' }
+  }[context] || { title: '新增', desc: '' };
+  document.getElementById('action-primary-title').textContent = config.title;
+  document.getElementById('action-primary-desc').textContent = config.desc;
+  document.getElementById('action-primary-icon').innerHTML = ACTION_ICONS[context] || ACTION_ICONS.itinerary;
+  openModal('add-action-sheet');
+}
+
 document.getElementById('fab').addEventListener('click', () => {
-  if (currentPage === 'itinerary') openModal('add-action-sheet');
+  if (currentPage === 'itinerary') openAddActionSheet('itinerary');
+  else if (currentPage === 'backup') openAddActionSheet('backup');
   else if (currentPage === 'expenses') openExpModal();
-  else if (currentPage === 'backup') openBkModal();
 });
 
-document.getElementById('action-add-itin').addEventListener('click', () => {
+document.getElementById('action-add-primary').addEventListener('click', () => {
   closeModal('add-action-sheet');
-  openItinModal();
+  if (actionSheetContext === 'backup') openBkModal();
+  else openItinModal();
 });
 document.getElementById('action-edit-notebook').addEventListener('click', () => {
   closeModal('add-action-sheet');
