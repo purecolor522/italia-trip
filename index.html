@@ -2950,8 +2950,10 @@ function buildSampleItinerary() {
     { id: "moydb2ibkx4a4t", time: "17:00", place: "艾曼紐二世紀念迴廊", city: "Milano", category: "行程", duration: "1 小時", notes: "十字形拱廊 · 米蘭最熱鬧地區" },
     { id: "moydb2ib4pusvb", time: "18:00", place: "斯卡拉歌劇院", city: "Milano", category: "行程", duration: "20 分鐘", notes: "下車參觀" },
     { id: "moydb2ibxom7uk", time: "18:30", place: "三隻鹿冰淇淋 Le Tre Gazzelle", city: "Milano", category: "必逛必吃", duration: "自由", notes: "1954年成立" },
-    { id: "moydb2ibzc0dbq", time: "18:30", place: "Luini PanZerotti 義大利餃子", city: "Milano", category: "必逛必吃", notes: "1888 年開創的百年小吃店 · 米蘭道地小吃" },
+    { id: "moydb2ibzc0dbq", time: "", place: "Luini PanZerotti 義大利餃子", city: "Milano", category: "必逛必吃", notes: "1888 年開創的百年小吃店 · 米蘭道地小吃" },
+    { id: "mozi3tws7id6lr", time: "", place: "Lemaire", city: "Milano", category: "精品", notes: "Piazza del Duomo, 20121 Milano MI, Italy\n4th floor" },
     { id: "moydb2ibg6mnar", time: "20:00", place: "義式風味晚餐", city: "Milano", category: "住宿", notes: "宿米蘭" },
+    { id: "mozlmphmgldwu2", time: "", place: "測試", city: "Milano", category: "" },
   ];
   itineraries["2026-05-17"] = [
     { id: "moydp5cf1qyng7", time: "", place: "集合時間", city: "Venezia", category: "集合" },
@@ -3027,13 +3029,13 @@ function buildSampleItinerary() {
     { id: "moydb2ibkm8k4u", time: "16:10", place: "抵達桃園機場", city: "Taoyuan", category: "入境", notes: "結束義大利深度之旅 · 平安回家" },
   ];
   const backups = [
-    { id: "moyhtu4ar90hbt", name: "Luini PanZerotti 義大利餃子", city: "Milano", date: "2026-05-16", notes: "1888 年開創的百年小吃店 · 米蘭道地小吃", pinColor: "pink" },
-    { id: "moyhts2k9ikggq", name: "三隻鹿冰淇淋 Le Tre Gazzelle", city: "Milano", date: "2026-05-16", notes: "1954年成立", pinColor: "pink" },
-    { id: "moydvq6xkwvlu8", name: "Suso icecream 冰淇淋", city: "Venezia", date: "2026-05-17", notes: "來自 05/17 行程", pinColor: "pink" },
-    { id: "moydvojqju0loj", name: "花神咖啡廳", city: "Venezia", date: "2026-05-17", notes: "來自 05/17 行程", pinColor: "pink" },
+    { id: "mozln83bhlufwi", name: "測試", city: "Milano", date: "2026-05-16", notes: "來自 05/16 行程", pinColor: "black", hiddenFromMap: true },
+    { id: "mozi6n9he181tx", name: "Lemaire", city: "Milano", date: "2026-05-16", notes: "Piazza del Duomo, 20121 Milano MI, Italy\n4th floor", pinColor: "pink" },
   ];
   const notebooks = {};
+  notebooks["2026-05-15"] = "桃園機場";
   notebooks["2026-05-16"] = "精品/藥局";
+  notebooks["2026-05-17"] = "推推推推";
   notebooks["2026-05-18"] = "比薩斜塔要入內嗎\n火車都是搭兩小時";
   notebooks["2026-05-19"] = "聖吉米娜諾必買：松露\n佛羅倫斯必買：皮件";
   notebooks["2026-05-21"] = "要吃暈車藥‼️‼️";
@@ -3043,7 +3045,7 @@ function buildSampleItinerary() {
 
 const SAMPLE_DATA = buildSampleItinerary();
 // Bump this whenever buildSampleItinerary above changes, so unmodified viewers see the latest on next load.
-const DATA_VERSION = '2026-05-10-3';
+const DATA_VERSION = '2026-05-11-1';
 
 let state = loadState() || {
   trip: { startDate: defaultStart, days: 11 },
