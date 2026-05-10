@@ -3045,7 +3045,7 @@ function buildSampleItinerary() {
 
 const SAMPLE_DATA = buildSampleItinerary();
 // Bump this whenever buildSampleItinerary above changes, so unmodified viewers see the latest on next load.
-const DATA_VERSION = '2026-05-11-1';
+const DATA_VERSION = '2026-05-11-2';
 
 let state = loadState() || {
   trip: { startDate: defaultStart, days: 11 },
@@ -4283,7 +4283,8 @@ window.addItinToMap = function(id) {
     city: item.city,
     date: currentDate,
     notes: item.notes || `來自 ${currentDate.slice(5).replace('-','/')} 行程`,
-    pinColor: PINK_CATEGORIES.has(item.category) ? 'pink' : 'black'
+    pinColor: PINK_CATEGORIES.has(item.category) ? 'pink' : 'black',
+    fromItinerary: true   // map-pin-only; do not show in 備用景點 list
   });
   saveState();
   toast(PINK_CATEGORIES.has(item.category) ? '已加入地圖（粉色 pin）' : '已加入地圖（黑色 pin）');
@@ -4838,7 +4839,7 @@ document.getElementById('exp-delete').addEventListener('click', async () => {
 /* ===== Backup ===== */
 function renderBackups() {
   const list = document.getElementById('backup-list');
-  const dayBackups = (state.backups || []).filter(b => (b.date || state.trip.startDate) === currentDate);
+  const dayBackups = (state.backups || []).filter(b => (b.date || state.trip.startDate) === currentDate && !b.fromItinerary);
   // Update section sub label
   const labelEl = document.getElementById('backup-day-label');
   if (labelEl) {
