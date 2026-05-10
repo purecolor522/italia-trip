@@ -5784,6 +5784,41 @@ function init() {
   fetchRates().then(updateRateInfo);
 }
 init();
+
+/* ===== Service Worker: offline support + auto-update ===== */
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').then((reg) => {
+      // When a new version is found, listen for it to finish installing
+      reg.addEventListener('updatefound', () => {
+        const nw = reg.installing;
+        if (!nw) return;
+        nw.addEventListener('statechange', () => {
+          if (nw.state === 'installed' && navigator.serviceWorker.controller) {
+            // A new SW is waiting. Apply silently on the *next* open by skipping wait.
+            // Avoids surprise reloads mid-session, but ensures users get the latest version next time.
+            try { nw.postMessage({ type: 'SKIP_WAITING' }); } catch (e) {}
+            toast('已更新到最新版');
+          }
+        });
+      });
+      // Periodically check for updates while app is open (every 30 min)
+      setInterval(() => { try { reg.update(); } catch (e) {} }, 30 * 60 * 1000);
+    }).catch((e) => console.warn('SW registration failed:', e));
+
+    // Reload once when the new SW takes control (only on next session, since we don't skipWaiting eagerly)
+    let didReload = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (didReload) return;
+      didReload = true;
+      // No reload — let the user finish their session; new shell loads on next manual open.
+    });
+  });
+
+  // Online/offline indicator hook — could be wired to a UI badge later
+  window.addEventListener('online', () => toast('已連線'));
+  window.addEventListener('offline', () => toast('已離線 · 仍可使用'));
+}
 </script>
 </body>
 </html>
