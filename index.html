@@ -2940,7 +2940,7 @@ function uid() { return Date.now().toString(36) + Math.random().toString(36).sli
 function buildSampleItinerary() {
   const itineraries = {};
   itineraries["2026-05-15"] = [
-    { id: "moydb2ibduh7ay", time: "17:45", place: "高鐵670車次", city: "Taiwan", category: "行程" },
+    { id: "moydb2ibduh7ay", time: "17:45", place: "高鐵670車次", city: "Taiwan", category: "車程" },
     { id: "moydb2ibee62vv", time: "20:05", place: "桃園機場第二航廈集合", city: "Dubai", category: "集合", notes: "阿聯酋航空櫃台 · 領隊：黃博榮 0920-077-877" },
     { id: "moydb2ibk2m34y", time: "23:05", place: "EK367 桃園 → 杜拜", city: "Dubai", category: "航班", notes: "航行 9h30m · 抵達 04:35+1\n夜宿機上" },
   ];
@@ -2953,15 +2953,14 @@ function buildSampleItinerary() {
     { id: "moydb2ibzc0dbq", time: "", place: "Luini PanZerotti 義大利餃子", city: "Milano", category: "必逛必吃", notes: "1888 年開創的百年小吃店 · 米蘭道地小吃" },
     { id: "mozi3tws7id6lr", time: "", place: "Lemaire", city: "Milano", category: "精品", notes: "Piazza del Duomo, 20121 Milano MI, Italy\n4th floor" },
     { id: "moydb2ibg6mnar", time: "20:00", place: "義式風味晚餐", city: "Milano", category: "住宿", notes: "宿米蘭" },
-    { id: "mozlmphmgldwu2", time: "", place: "測試", city: "Milano", category: "" },
   ];
   itineraries["2026-05-17"] = [
     { id: "moydp5cf1qyng7", time: "", place: "集合時間", city: "Venezia", category: "集合" },
     { id: "moydb2ibqakfmx", time: "", place: "聖馬可廣場 Piazza San Marco", city: "Venezia", category: "行程", notes: "歐洲會客廳" },
     { id: "moydb2ib3b5krw", time: "14:30", place: "Basilica di San Marco 聖馬可大教堂", city: "Venezia", category: "行程", duration: "1 小時", notes: "古典、羅馬、歌德、拜占庭融合" },
     { id: "moydb2ibobnhjg", time: "15:30", place: "嘆息橋 · 道奇宮 Ponte dei Sospiri · Palazzo Ducale", city: "Venezia", category: "行程", duration: "1 小時", notes: "《情定日落橋》取景地" },
-    { id: "moydvh45rtlfp2", time: "", place: "Suso icecream 冰淇淋", city: "Venezia", category: "必逛必吃" },
     { id: "moydtr1tv6h3qd", time: "", place: "弗洛里安花神咖啡館 Caffè Florian", city: "Venezia", category: "必逛必吃" },
+    { id: "moydvh45rtlfp2", time: "", place: "Suso Gelato冰淇淋", city: "Venezia", category: "必逛必吃", notes: "Sotoportego de la Bissa, 5453, 30124 Venezia VE" },
     { id: "moydb2ibsci1c5", time: "18:00", place: "自由活動 · 晚餐自理", city: "Venezia", category: "行程", duration: "自由", notes: "可選購蕾莉歐等" },
   ];
   itineraries["2026-05-18"] = [
@@ -2971,6 +2970,7 @@ function buildSampleItinerary() {
     { id: "moyens30er5bpz", time: "14:00", place: "波隆那→比薩", city: "Bologna", category: "行程", duration: "2 小時" },
     { id: "moydb2ibtcgn0t", time: "15:00", place: "比薩斜塔 Torre di Pisa", city: "Pisa", category: "行程", duration: "1.5 小時", notes: "世界七大建築奇景之一 · 伽利略誕生地" },
     { id: "moydb2ibobfotm", time: "19:00", place: "義式風味晚餐", city: "Pisa", category: "住宿", notes: "宿比薩 / 托斯卡納" },
+    { id: "mozu4loiasvauv", time: "", place: "再測", city: "Bologna", category: "" },
   ];
   itineraries["2026-05-19"] = [
     { id: "moydb2ibnxozqo", time: "08:00", place: "飯店早餐", city: "Pisa", category: "早餐", notes: "飯店內自助式早餐" },
@@ -3029,8 +3029,20 @@ function buildSampleItinerary() {
     { id: "moydb2ibkm8k4u", time: "16:10", place: "抵達桃園機場", city: "Taoyuan", category: "入境", notes: "結束義大利深度之旅 · 平安回家" },
   ];
   const backups = [
-    { id: "mozln83bhlufwi", name: "測試", city: "Milano", date: "2026-05-16", notes: "來自 05/16 行程", pinColor: "black", hiddenFromMap: true },
-    { id: "mozi6n9he181tx", name: "Lemaire", city: "Milano", date: "2026-05-16", notes: "Piazza del Duomo, 20121 Milano MI, Italy\n4th floor", pinColor: "pink" },
+    { id: "mozv2wqbzj82or", name: "Suso Gelato冰淇淋", city: "Venezia", date: "2026-05-17", notes: "Sotoportego de la Bissa, 5453, 30124 Venezia VE", pinColor: "pink", fromItinerary: true, lat: 45.4389559, lng: 12.3371303 },
+    { id: "mozuwt0jchx24j", name: "Suso icecream 冰淇淋", city: "Venezia", date: "2026-05-17", notes: "來自 05/17 行程", pinColor: "pink", hiddenFromMap: true, fromItinerary: true },
+    { id: "mozuva18ts5tpe", name: "嘆息橋 · 道奇宮 Ponte dei Sospiri · Palazzo Ducale", city: "Venezia", date: "2026-05-17", notes: "《情定日落橋》取景地", pinColor: "black", hiddenFromMap: true, fromItinerary: true },
+    { id: "mozuuw7cz72wmm", name: "聖馬可廣場 Piazza San Marco", city: "Venezia", date: "2026-05-17", notes: "歐洲會客廳", pinColor: "black", fromItinerary: true, lat: 45.4342571, lng: 12.3386717 },
+    { id: "mozuu9hsnmnu4t", name: "弗洛里安花神咖啡館 Caffè Florian", city: "Venezia", date: "2026-05-17", notes: "來自 05/17 行程", pinColor: "pink", fromItinerary: true, lat: 45.4336006, lng: 12.3382833 },
+    { id: "mozutncw2jpoj5", name: "Lemaire", city: "Milano", date: "2026-05-16", notes: "Piazza del Duomo, 20121 Milano MI, Italy\n4th floor", pinColor: "pink", fromItinerary: true },
+    { id: "mozut4piqlf70o", name: "斯卡拉歌劇院 Teatro alla Scala", city: "Milano", date: "2026-05-16", notes: "下車參觀", pinColor: "black", fromItinerary: true, lat: 45.4676041, lng: 9.1891136 },
+    { id: "mozus5fyyqfw1n", name: "艾曼紐二世紀念迴廊 Galleria Vittorio Emanuele II", city: "Milano", date: "2026-05-16", notes: "十字形拱廊 · 米蘭最熱鬧地區", pinColor: "black", fromItinerary: true, lat: 45.4656113, lng: 9.1900062 },
+    { id: "mozufn3fb1ck9y", name: "Pompei 龐貝古城", city: "Pompei", date: "2026-05-20", notes: "AD79 維蘇威火山覆蓋 · 棋盤狀街道、神殿、浴池", pinColor: "black", fromItinerary: true, lat: 40.7509175, lng: 14.4884757 },
+    { id: "mozuboy1uppj0o", name: "Luini PanZerotti 義大利餃子", city: "Milano", date: "2026-05-16", notes: "1888 年開創的百年小吃店 · 米蘭道地小吃", pinColor: "pink", fromItinerary: true },
+    { id: "mozubn3f3j4kb9", name: "三隻鹿冰淇淋 Le Tre Gazzelle", city: "Milano", date: "2026-05-16", notes: "1954年成立", pinColor: "pink", fromItinerary: true, lat: 45.4652696, lng: 9.1951959 },
+    { id: "mozubjotft0las", name: "Duomo di Milano 米蘭大教堂", city: "Milano", date: "2026-05-16", notes: "世界第三大教堂 · 徐志摩稱「大理石的詩篇」", pinColor: "black", fromItinerary: true, lat: 45.4641669, lng: 9.1916121 },
+    { id: "mozub1e3w40po9", name: "艾曼紐二世紀念迴廊", city: "Milano", date: "2026-05-16", notes: "十字形拱廊 · 米蘭最熱鬧地區", pinColor: "black", hiddenFromMap: true, fromItinerary: true },
+    { id: "mozu5fspkbpo85", name: "Basilica di San Marco 聖馬可大教堂", city: "Venezia", date: "2026-05-17", notes: "古典、羅馬、歌德、拜占庭融合", pinColor: "black", lat: 45.4345479, lng: 12.3398218 },
   ];
   const notebooks = {};
   notebooks["2026-05-15"] = "桃園機場";
@@ -3045,7 +3057,7 @@ function buildSampleItinerary() {
 
 const SAMPLE_DATA = buildSampleItinerary();
 // Bump this whenever buildSampleItinerary above changes, so unmodified viewers see the latest on next load.
-const DATA_VERSION = '2026-05-11-3';
+const DATA_VERSION = '2026-05-11-4';
 
 let state = loadState() || {
   trip: { startDate: defaultStart, days: 11 },
@@ -5587,6 +5599,21 @@ function populateBkDateSelect() {
   }).join('');
 }
 
+function migrateBackupsFromItineraryFlag_v1() {
+  if (state._bk_from_itin_v1) return;
+  const itinPlaces = new Set();
+  Object.values(state.itineraries || {}).forEach(arr => {
+    if (Array.isArray(arr)) arr.forEach(it => { if (it && it.place) itinPlaces.add(it.place); });
+  });
+  (state.backups || []).forEach(b => {
+    if (!b.fromItinerary && b.name && itinPlaces.has(b.name)) {
+      b.fromItinerary = true;
+    }
+  });
+  state._bk_from_itin_v1 = true;
+  saveState({ silent: true });
+}
+
 function migrateAddOriginalNames_v1() {
   if (state._origNames_v1) return;
   const RENAMES = {
@@ -5872,6 +5899,7 @@ function init() {
   migrateDay2Panzerotti();
   migrateCategoryToXingcheng();
   migrateAddOriginalNames_v1();
+  migrateBackupsFromItineraryFlag_v1();
   state.hasUserEdits = prevUserEdits; // migrations don't count as user edits
   // Now check if SAMPLE_DATA changed since this state was last touched and refresh for pristine viewers
   maybeRefreshFromSample();
