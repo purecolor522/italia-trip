@@ -500,49 +500,63 @@
     color: var(--ink-500);
     margin-top: 2px;
   }
-  .day-summary { position: relative; }
-  .day-summary .meet {
+  .day-summary .right { display: flex; align-items: center; gap: 12px; }
+
+  .meet-card {
     margin-top: 10px;
-    padding: 8px 12px;
-    background: rgba(255, 255, 255, .55);
-    border: 1px dashed rgba(135, 98, 56, .35);
-    border-radius: 12px;
+    background: var(--oat-50);
+    border: 1px solid rgba(168, 134, 84, .22);
+    border-radius: var(--radius-md);
+    padding: 12px 16px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 10px;
+    gap: 12px;
+    box-shadow: var(--shadow-soft);
     cursor: pointer;
-    transition: background .15s;
+    transition: background .15s, transform .12s;
   }
-  .day-summary .meet:active { background: rgba(255, 255, 255, .8); }
-  .day-summary .meet .meet-label {
-    display: flex; align-items: center; gap: 6px;
+  .meet-card:active { background: var(--oat-100); transform: scale(.99); }
+  .meet-card .meet-left { display: flex; align-items: center; gap: 10px; }
+  .meet-card .meet-icon {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: rgba(135, 98, 56, .1);
+    display: grid; place-items: center;
+    color: var(--tan-600);
+    flex-shrink: 0;
+  }
+  .meet-card .meet-icon svg { width: 18px; height: 18px; }
+  .meet-card .meet-text { display: flex; flex-direction: column; gap: 2px; }
+  .meet-card .meet-label {
     font-family: 'Noto Serif TC', serif;
     font-size: 13px;
     color: var(--tan-600);
     font-weight: 500;
     letter-spacing: .04em;
   }
-  .day-summary .meet .meet-label svg { width: 14px; height: 14px; }
-  .day-summary .meet .meet-time {
+  .meet-card .meet-label-en {
     font-family: 'Cormorant Garamond', serif;
-    font-size: 22px;
+    font-style: italic;
+    font-size: 11px;
+    color: var(--ink-500);
+    letter-spacing: .1em;
+  }
+  .meet-card .meet-time {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 28px;
     color: var(--ink-900);
     font-weight: 500;
     letter-spacing: .02em;
+    line-height: 1;
   }
-  .day-summary .meet .meet-time.empty {
+  .meet-card .meet-time.empty {
     font-family: 'Noto Sans TC', sans-serif;
     font-size: 13px;
     color: var(--ink-500);
     font-weight: 400;
     font-style: italic;
   }
-  .day-summary .meet-row { grid-column: 1 / -1; }
-  .day-summary { flex-wrap: wrap; }
-  .day-summary > .left, .day-summary > .right { flex: 0 0 auto; }
-  .day-summary .right { display: flex; align-items: center; gap: 12px; }
-  .day-summary .meet { width: 100%; }
   .day-summary .temp {
     font-family: 'Cormorant Garamond', serif;
     font-size: 34px;
@@ -2285,13 +2299,19 @@
           </div>
           <div class="temp" id="ds-temp">--<span class="deg">°</span></div>
         </div>
-        <div class="meet meet-row" id="ds-meet" onclick="openMeetingTimeModal()">
-          <div class="meet-label">
+      </div>
+
+      <div class="meet-card" id="ds-meet" onclick="openMeetingTimeModal()">
+        <div class="meet-left">
+          <div class="meet-icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 14"/></svg>
-            現在集合時間
           </div>
-          <div class="meet-time empty" id="ds-meet-time">點擊設定</div>
+          <div class="meet-text">
+            <div class="meet-label">現在集合時間</div>
+            <div class="meet-label-en">Meeting Time</div>
+          </div>
         </div>
+        <div class="meet-time empty" id="ds-meet-time">點擊設定</div>
       </div>
 
       <div class="section-label">
