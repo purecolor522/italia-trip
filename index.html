@@ -1329,6 +1329,15 @@
   .expense-card .cat-icon svg { width: 18px; height: 18px; color: var(--ink-700); }
   .expense-card .e-info { min-width: 0; flex: 1; }
   .expense-card .e-note { font-size: 16px; font-weight: 600; color: var(--ink-900); margin-bottom: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .paperclip-badge {
+    display: inline-flex; align-items: center; gap: 2px;
+    color: var(--tan-600);
+    font-size: 11px;
+    font-weight: 500;
+    margin-left: 4px;
+    vertical-align: middle;
+  }
+  .paperclip-badge svg { width: 13px !important; height: 13px !important; }
   .expense-card .e-cat { font-size: 13px; color: var(--ink-500); font-weight: 500; }
   .expense-card .e-amt { font-family: 'Cormorant Garamond', serif; text-align: right; flex: 0 0 auto; }
   .expense-card .e-amt .twd { font-size: 18px; color: var(--ink-900); font-weight: 600; }
@@ -2633,6 +2642,15 @@
     <div class="field"><label>說明 <span class="en">Description</span></label><input type="text" id="exp-note" placeholder="例: 義大利麵 · Trattoria" /></div>
     <div class="field"><label>日期 <span class="en">Date</span></label><input type="date" id="exp-date" /></div>
     <div id="exp-converted" class="exp-converted-display"></div>
+    <div class="field">
+      <label>收據 <span class="en">Receipt</span></label>
+      <div class="photo-list" id="exp-photo-list"></div>
+      <button type="button" class="btn-add-photo" id="exp-add-photo">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+        新增收據照片
+      </button>
+      <input type="file" id="exp-file-input" accept="image/*" multiple style="display:none">
+    </div>
     <div class="btn-row" id="exp-edit-row" style="display:none;">
       <button class="btn btn-danger" id="exp-delete">刪除</button>
       <button class="btn btn-primary" id="exp-save-edit">儲存</button>
@@ -3039,6 +3057,7 @@ if (!state.notebooks) state.notebooks = {};
 if (!state.hiddenFromMap) state.hiddenFromMap = {};
 if (!state.meetingTimes) state.meetingTimes = {};
 if (!state.notebookPhotos) state.notebookPhotos = {};
+if (!state.expensePhotos) state.expensePhotos = {};
 
 /* ===== IndexedDB for notebook photos ===== */
 const PHOTO_DB = 'italia_photos_v1';
@@ -4536,7 +4555,7 @@ function expenseCard(e) {
         <div class="left">
           <div class="cat-icon">${catIcon(e.cat)}</div>
           <div class="e-info">
-            <div class="e-note">${escape(e.note || e.cat)}</div>
+            <div class="e-note">${escape(e.note || e.cat)}<span class="e-paperclip">${expensePhotoBadge(e.id)}</span></div>
             <div class="e-cat">${escape(e.cat)}</div>
           </div>
         </div>
@@ -4546,6 +4565,11 @@ function expenseCard(e) {
         </div>
       </div>
     </div>`;
+}
+function expensePhotoBadge(expId) {
+  const n = ((state.expensePhotos && state.expensePhotos[expId]) || []).length;
+  if (!n) return '';
+  return ` <span class="paperclip-badge" title="${n} 張收據"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m21 8-9.04 9.06a5 5 0 1 1-7.07-7.07l9.05-9.06a3.5 3.5 0 1 1 4.95 4.95L9.84 14.84a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>${n > 1 ? n : ''}</span>`;
 }
 function catIcon(cat) {
   const stroke = 'currentColor';
@@ -4570,22 +4594,87 @@ window.editExp = function(id) {
   document.getElementById('exp-note').value = e.note || '';
   document.getElementById('exp-date').value = e.date;
   updateExpConverted();
+  renderExpensePhotoList();
   document.getElementById('exp-save').style.display = 'none';
   document.getElementById('exp-edit-row').style.display = 'grid';
   openModal('exp-modal');
 };
 function openExpModal() {
-  editingExpId = null;
+  // Pre-assign id so photos can attach before save
+  editingExpId = uid();
   document.querySelectorAll('#exp-cat-pills .pill').forEach((p,i) => p.classList.toggle('active', i === 0));
   document.getElementById('exp-amount').value = '';
   document.getElementById('exp-currency').value = 'EUR';
   document.getElementById('exp-note').value = '';
   document.getElementById('exp-date').value = currentDate;
   document.getElementById('exp-converted').textContent = '';
+  renderExpensePhotoList();
   document.getElementById('exp-save').style.display = 'flex';
   document.getElementById('exp-edit-row').style.display = 'none';
   openModal('exp-modal');
 }
+
+function renderExpensePhotoList() {
+  const list = document.getElementById('exp-photo-list');
+  if (!list) return;
+  const photos = (state.expensePhotos && state.expensePhotos[editingExpId]) || [];
+  if (!photos.length) { list.innerHTML = ''; return; }
+  list.innerHTML = photos.map(p => `
+    <div class="photo-row">
+      <div class="photo-thumb loading" data-photo-id="${p.id}" onclick="viewNotebookPhoto('${p.id}')"></div>
+      <div class="photo-name" onclick="viewNotebookPhoto('${p.id}')">${escape(p.filename)}</div>
+      <button type="button" class="photo-del" onclick="removeExpensePhoto('${p.id}')" aria-label="刪除">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+  `).join('');
+  hydrateThumbs(list);
+}
+
+document.getElementById('exp-add-photo').addEventListener('click', () => {
+  document.getElementById('exp-file-input').click();
+});
+
+document.getElementById('exp-file-input').addEventListener('change', async (e) => {
+  const files = Array.from(e.target.files || []);
+  if (!files.length || !editingExpId) return;
+  state.expensePhotos[editingExpId] = state.expensePhotos[editingExpId] || [];
+  for (const file of files) {
+    if (!file.type.startsWith('image/')) continue;
+    const id = uid();
+    try {
+      await putPhotoBlob(id, file);
+      state.expensePhotos[editingExpId].push({
+        id,
+        filename: file.name || `receipt-${Date.now()}.jpg`,
+        addedAt: Date.now()
+      });
+    } catch (err) {
+      toast('收據儲存失敗 · ' + (err.message || ''));
+    }
+  }
+  saveState();
+  renderExpensePhotoList();
+  e.target.value = '';
+  toast(`已新增 ${files.length} 張收據`);
+});
+
+window.removeExpensePhoto = async function(photoId) {
+  if (!confirm('要刪除這張收據嗎？此操作無法復原。')) return;
+  try { await deletePhotoBlob(photoId); } catch (e) {}
+  if (_thumbUrlCache.has(photoId)) {
+    try { URL.revokeObjectURL(_thumbUrlCache.get(photoId)); } catch (e) {}
+    _thumbUrlCache.delete(photoId);
+  }
+  if (state.expensePhotos[editingExpId]) {
+    state.expensePhotos[editingExpId] = state.expensePhotos[editingExpId].filter(p => p.id !== photoId);
+    if (!state.expensePhotos[editingExpId].length) delete state.expensePhotos[editingExpId];
+  }
+  saveState();
+  renderExpensePhotoList();
+  if (currentPage === 'expenses') renderExpenses();
+  toast('已刪除收據');
+};
 document.querySelectorAll('#exp-cat-pills .pill').forEach(p => {
   p.addEventListener('click', () => {
     document.querySelectorAll('#exp-cat-pills .pill').forEach(x => x.classList.remove('active'));
@@ -4615,12 +4704,9 @@ function saveExp() {
     note: document.getElementById('exp-note').value.trim(),
     date: document.getElementById('exp-date').value || currentDate
   };
-  if (editingExpId) {
-    const idx = state.expenses.findIndex(e => e.id === editingExpId);
-    if (idx >= 0) state.expenses[idx] = exp;
-  } else {
-    state.expenses.push(exp);
-  }
+  const idx = state.expenses.findIndex(e => e.id === exp.id);
+  if (idx >= 0) state.expenses[idx] = exp;
+  else state.expenses.push(exp);
   saveState();
   closeModal('exp-modal');
   renderExpenses();
@@ -4629,11 +4715,21 @@ function saveExp() {
 document.getElementById('exp-save').addEventListener('click', saveExp);
 document.getElementById('exp-save-edit').addEventListener('click', saveExp);
 
-window.confirmDeleteExp = function(id) {
+window.confirmDeleteExp = async function(id) {
   if (!confirm('確定要刪除這筆支出嗎？')) {
     document.querySelectorAll('.expense-card-wrap.swiped').forEach(w => w.classList.remove('swiped'));
     return;
   }
+  // Clean up associated receipt photos in IndexedDB
+  const photos = (state.expensePhotos && state.expensePhotos[id]) || [];
+  for (const p of photos) {
+    try { await deletePhotoBlob(p.id); } catch (e) {}
+    if (_thumbUrlCache.has(p.id)) {
+      try { URL.revokeObjectURL(_thumbUrlCache.get(p.id)); } catch (e) {}
+      _thumbUrlCache.delete(p.id);
+    }
+  }
+  if (state.expensePhotos) delete state.expensePhotos[id];
   state.expenses = state.expenses.filter(e => e.id !== id);
   saveState();
   renderExpenses();
@@ -4710,9 +4806,18 @@ function setupSwipeOnExpenseCards() {
     }, true);
   });
 }
-document.getElementById('exp-delete').addEventListener('click', () => {
+document.getElementById('exp-delete').addEventListener('click', async () => {
   if (!editingExpId) return;
   if (!confirm('確定要刪除這筆支出嗎？')) return;
+  const photos = (state.expensePhotos && state.expensePhotos[editingExpId]) || [];
+  for (const p of photos) {
+    try { await deletePhotoBlob(p.id); } catch (e) {}
+    if (_thumbUrlCache.has(p.id)) {
+      try { URL.revokeObjectURL(_thumbUrlCache.get(p.id)); } catch (e) {}
+      _thumbUrlCache.delete(p.id);
+    }
+  }
+  if (state.expensePhotos) delete state.expensePhotos[editingExpId];
   state.expenses = state.expenses.filter(e => e.id !== editingExpId);
   saveState();
   closeModal('exp-modal');
