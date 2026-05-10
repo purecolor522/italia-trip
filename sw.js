@@ -1,6 +1,6 @@
 // Italia trip — Service Worker
 // Bump CACHE_VERSION when shipping a new build that should invalidate caches.
-const CACHE_VERSION = '2026-05-11-4';
+const CACHE_VERSION = '2026-05-11-5';
 const SHELL_CACHE = `italia-shell-${CACHE_VERSION}`;
 const RUNTIME_CACHE = `italia-runtime-${CACHE_VERSION}`;
 const TILE_CACHE = `italia-tiles-${CACHE_VERSION}`;
