@@ -500,7 +500,49 @@
     color: var(--ink-500);
     margin-top: 2px;
   }
+  .day-summary { position: relative; }
+  .day-summary .meet {
+    margin-top: 10px;
+    padding: 8px 12px;
+    background: rgba(255, 255, 255, .55);
+    border: 1px dashed rgba(135, 98, 56, .35);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    cursor: pointer;
+    transition: background .15s;
+  }
+  .day-summary .meet:active { background: rgba(255, 255, 255, .8); }
+  .day-summary .meet .meet-label {
+    display: flex; align-items: center; gap: 6px;
+    font-family: 'Noto Serif TC', serif;
+    font-size: 13px;
+    color: var(--tan-600);
+    font-weight: 500;
+    letter-spacing: .04em;
+  }
+  .day-summary .meet .meet-label svg { width: 14px; height: 14px; }
+  .day-summary .meet .meet-time {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    color: var(--ink-900);
+    font-weight: 500;
+    letter-spacing: .02em;
+  }
+  .day-summary .meet .meet-time.empty {
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 13px;
+    color: var(--ink-500);
+    font-weight: 400;
+    font-style: italic;
+  }
+  .day-summary .meet-row { grid-column: 1 / -1; }
+  .day-summary { flex-wrap: wrap; }
+  .day-summary > .left, .day-summary > .right { flex: 0 0 auto; }
   .day-summary .right { display: flex; align-items: center; gap: 12px; }
+  .day-summary .meet { width: 100%; }
   .day-summary .temp {
     font-family: 'Cormorant Garamond', serif;
     font-size: 34px;
@@ -2243,6 +2285,13 @@
           </div>
           <div class="temp" id="ds-temp">--<span class="deg">°</span></div>
         </div>
+        <div class="meet meet-row" id="ds-meet" onclick="openMeetingTimeModal()">
+          <div class="meet-label">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 14"/></svg>
+            現在集合時間
+          </div>
+          <div class="meet-time empty" id="ds-meet-time">點擊設定</div>
+        </div>
       </div>
 
       <div class="section-label">
@@ -2532,6 +2581,26 @@
       </div>
       <svg class="action-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
     </button>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="meet-modal">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <h2>現在集合時間<span class="en">Meeting Time</span></h2>
+    <div class="modal-sub" id="meet-modal-date">2026/05/15</div>
+    <div class="field">
+      <label>時間 <span class="en">Time</span></label>
+      <div class="time-select-row">
+        <select id="meet-time-h" aria-label="時"></select>
+        <span class="time-colon">:</span>
+        <select id="meet-time-m" aria-label="分"></select>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-danger" id="meet-clear">清除</button>
+      <button class="btn btn-primary" id="meet-save">儲存</button>
+    </div>
   </div>
 </div>
 
@@ -2844,6 +2913,7 @@ let state = loadState() || {
 };
 if (!state.notebooks) state.notebooks = {};
 if (!state.hiddenFromMap) state.hiddenFromMap = {};
+if (!state.meetingTimes) state.meetingTimes = {};
 
 let currentDate = state.trip.startDate;
 let currentPage = 'home';
@@ -2980,12 +3050,75 @@ async function renderWeatherForDay() {
   const dayIdx = genDates().findIndex(d => d.iso === currentDate) + 1;
   document.getElementById('ds-meta').textContent = `第 ${dayIdx} 天 · 行程 ${items.length} 個`;
   document.getElementById('ds-temp').innerHTML = `--<span class="deg">°</span>`;
+  renderMeetingTime();
   const w = await fetchWeather(coord.lat, coord.lng, currentDate);
   if (w) {
     document.getElementById('ds-temp').innerHTML = `${w.avg}<span class="deg">°</span>`;
     document.getElementById('ds-icon').innerHTML = weatherIconSvg(w.code);
   }
 }
+
+function renderMeetingTime() {
+  const el = document.getElementById('ds-meet-time');
+  if (!el) return;
+  const t = (state.meetingTimes || {})[currentDate];
+  if (t) {
+    el.textContent = t;
+    el.classList.remove('empty');
+  } else {
+    el.textContent = '點擊設定';
+    el.classList.add('empty');
+  }
+}
+
+window.openMeetingTimeModal = function() {
+  const modal = document.getElementById('meet-modal');
+  const dateEl = document.getElementById('meet-modal-date');
+  const dateObj = new Date(currentDate);
+  const w = ['日','一','二','三','四','五','六'][dateObj.getDay()];
+  dateEl.textContent = `${currentDate.replace(/-/g,'/')} (${w})`;
+  const cur = (state.meetingTimes || {})[currentDate] || '';
+  const [h, m] = cur ? cur.split(':') : ['', ''];
+  const hSel = document.getElementById('meet-time-h');
+  const mSel = document.getElementById('meet-time-m');
+  if (!hSel.options.length) {
+    let hHtml = '<option value="">--</option>';
+    for (let i = 0; i < 24; i++) hHtml += `<option value="${i.toString().padStart(2,'0')}">${i.toString().padStart(2,'0')}</option>`;
+    hSel.innerHTML = hHtml;
+    let mHtml = '<option value="">--</option>';
+    for (let i = 0; i < 60; i += 5) mHtml += `<option value="${i.toString().padStart(2,'0')}">${i.toString().padStart(2,'0')}</option>`;
+    mSel.innerHTML = mHtml;
+  }
+  hSel.value = h || '';
+  mSel.value = m || '';
+  modal.classList.add('active');
+};
+
+document.getElementById('meet-save').addEventListener('click', () => {
+  const h = document.getElementById('meet-time-h').value;
+  const m = document.getElementById('meet-time-m').value;
+  if (!h || !m) { toast('請選擇時間'); return; }
+  state.meetingTimes = state.meetingTimes || {};
+  state.meetingTimes[currentDate] = `${h}:${m}`;
+  saveState();
+  document.getElementById('meet-modal').classList.remove('active');
+  renderMeetingTime();
+  toast('已更新集合時間');
+});
+
+document.getElementById('meet-clear').addEventListener('click', () => {
+  if (state.meetingTimes && state.meetingTimes[currentDate]) {
+    delete state.meetingTimes[currentDate];
+    saveState();
+  }
+  document.getElementById('meet-modal').classList.remove('active');
+  renderMeetingTime();
+  toast('已清除集合時間');
+});
+
+document.getElementById('meet-modal').addEventListener('click', (e) => {
+  if (e.target.id === 'meet-modal') e.currentTarget.classList.remove('active');
+});
 
 function mostCommonCity(items) {
   const counts = {};
@@ -3346,7 +3479,7 @@ function populateDurationSelect() {
   sel.innerHTML = html;
 }
 
-const CATEGORIES = ['必逛必吃','精品','集合','航班','出境','入境','車程','船程','住宿','自由活動','早餐','午餐','晚餐','半日','全日'];
+const CATEGORIES = ['必逛必吃','精品','集合','航班','出境','入境','車程','船程','住宿','自由活動','早餐','午餐','晚餐','行程'];
 const PINK_CATEGORIES = new Set(['必逛必吃', '精品']);
 const TIME_DISPLAY_CATEGORIES = new Set(['航班', '入境', '集合', '車程']);
 
@@ -3481,7 +3614,7 @@ function showPage(name) {
   // Date strip on home, itinerary, map, backup, and expenses-daily mode
   setDateStripVisible(name === 'home' || name === 'itinerary' || name === 'map' || name === 'backup' || (name === 'expenses' && expenseMode === 'daily'));
   if (name === 'home') renderHome();
-  else if (name === 'map') { setTimeout(() => { initMapIfNeeded(); renderMapPins(); }, 50); }
+  else if (name === 'map') { setTimeout(() => { initMapIfNeeded(); renderMapPins(); if (!currentLocation) locateMe({ silent: true }); }, 50); }
   else if (name === 'expenses') renderExpenses();
   else if (name === 'backup') renderBackups();
   else if (name === 'itinerary') renderItinerary();
@@ -3716,9 +3849,14 @@ async function renderMapPins() {
 
   // Saved pins — color depends on b.pinColor
   for (const b of savedItems) {
-    const item = { id: b.id, place: b.name, city: b.city, notes: b.notes };
+    const item = { id: b.id, place: b.name, city: b.city, notes: b.notes, lat: b.lat, lng: b.lng };
     let coord = await geocodeItem(item);
     if (!coord) continue;
+    // Persist real coords on the backup so the map shows the same point next time
+    if (!coord._fallback && (b.lat == null || b.lng == null)) {
+      b.lat = coord.lat; b.lng = coord.lng;
+      saveState();
+    }
     const colorClass = b.pinColor === 'pink' ? 'saved' : '';
     const html = `<div class="map-pin ${colorClass}"><span>★</span></div>`;
     const icon = L.divIcon({ html, className: '', iconSize: [32, 40], iconAnchor: [16, 38] });
@@ -3805,45 +3943,119 @@ window.addItinToMap = function(id) {
   saveState();
   toast(PINK_CATEGORIES.has(item.category) ? '已加入地圖（粉色 pin）' : '已加入地圖（黑色 pin）');
 };
-const geocodeCache = {};
+const GEOCODE_CACHE_KEY = 'italia_geocode_v2';
+let geocodeCache = (() => {
+  try { return JSON.parse(localStorage.getItem(GEOCODE_CACHE_KEY) || '{}'); } catch (e) { return {}; }
+})();
+function saveGeocodeCache() {
+  try { localStorage.setItem(GEOCODE_CACHE_KEY, JSON.stringify(geocodeCache)); } catch (e) {}
+}
+function stripCN(s) {
+  return (s || '').replace(/[一-鿿·•・，,。.!！？?「」『』（）()【】［］\[\]【】]/g, ' ').replace(/\s+/g, ' ').trim();
+}
+async function nominatimQuery(params) {
+  try {
+    const url = `https://nominatim.openstreetmap.org/search?${params}&format=json&limit=1&addressdetails=0`;
+    const resp = await fetch(url, { headers: { 'Accept-Language': 'zh-TW,en' } });
+    if (!resp.ok) return null;
+    const data = await resp.json();
+    if (data && data.length) return { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) };
+  } catch (e) {}
+  return null;
+}
 async function geocodeItem(item) {
   const cacheKey = `${item.place}__${item.city}`;
   if (geocodeCache[cacheKey]) return geocodeCache[cacheKey];
-  try {
-    const q = encodeURIComponent(`${item.place}, ${item.city}, Italy`);
-    const resp = await fetch(`https://nominatim.openstreetmap.org/search?q=${q}&format=json&limit=1`, { headers: { 'Accept-Language': 'zh-TW,en' } });
-    const data = await resp.json();
-    if (data && data.length) {
-      const c = { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) };
+  if (item.lat != null && item.lng != null) {
+    geocodeCache[cacheKey] = { lat: item.lat, lng: item.lng };
+    saveGeocodeCache();
+    return geocodeCache[cacheKey];
+  }
+  const cityCoord = CITY_COORDS[item.city];
+  // Bias the search to a box around the city (≈ 0.3° = ~33km)
+  let viewbox = '';
+  if (cityCoord) {
+    const d = 0.3;
+    viewbox = `&viewbox=${cityCoord.lng - d},${cityCoord.lat + d},${cityCoord.lng + d},${cityCoord.lat - d}&bounded=1`;
+  }
+  const placeStripped = stripCN(item.place);
+  const queries = [];
+  if (item.place) {
+    queries.push(`q=${encodeURIComponent(item.place + ', ' + item.city + ', Italy')}`);
+    if (placeStripped && placeStripped !== item.place) {
+      queries.push(`q=${encodeURIComponent(placeStripped + ', ' + item.city + ', Italy')}`);
+    }
+    queries.push(`q=${encodeURIComponent(item.place + ', ' + item.city)}${viewbox}`);
+    if (placeStripped) {
+      queries.push(`q=${encodeURIComponent(placeStripped)}${viewbox}`);
+    }
+  }
+  for (const q of queries) {
+    const c = await nominatimQuery(q);
+    if (c) {
       geocodeCache[cacheKey] = c;
+      saveGeocodeCache();
       return c;
     }
-  } catch (e) {}
-  const c = CITY_COORDS[item.city];
-  if (c) {
-    const jitter = (item.id.charCodeAt(0) % 5) * 0.001;
-    const fb = { lat: c.lat + jitter, lng: c.lng + jitter };
+    await new Promise(r => setTimeout(r, 1100)); // respect Nominatim 1 req/sec
+  }
+  if (cityCoord) {
+    const jitter = ((item.id || '').charCodeAt(0) % 5) * 0.001;
+    const fb = { lat: cityCoord.lat + jitter, lng: cityCoord.lng + jitter, _fallback: true };
     geocodeCache[cacheKey] = fb;
+    saveGeocodeCache();
     return fb;
   }
   return null;
 }
-function locateMe() {
+let meAccuracyCircle = null;
+let meWatchId = null;
+function placeMeMarker(lat, lng, accuracy) {
+  if (!map) return;
+  if (meMarker) map.removeLayer(meMarker);
+  if (meAccuracyCircle) map.removeLayer(meAccuracyCircle);
+  const icon = L.divIcon({ html: '<div class="me-pin"></div>', className: '', iconSize: [18,18], iconAnchor: [9,9] });
+  meMarker = L.marker([lat, lng], { icon, zIndexOffset: 1000 }).addTo(map);
+  meMarker.bindPopup(`<div class="popup-title">你在這裡</div><div class="popup-meta">±${Math.round(accuracy || 0)} m</div>`);
+  if (accuracy && accuracy < 2000) {
+    meAccuracyCircle = L.circle([lat, lng], {
+      radius: accuracy,
+      color: '#876238',
+      fillColor: '#876238',
+      fillOpacity: 0.08,
+      weight: 1,
+      interactive: false
+    }).addTo(map);
+  }
+}
+function locateMe(opts) {
+  opts = opts || {};
   if (!navigator.geolocation) { toast('裝置不支援定位'); return; }
   document.getElementById('map-loc-status').textContent = '定位中...';
-  navigator.geolocation.getCurrentPosition(pos => {
-    currentLocation = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-    if (meMarker) map.removeLayer(meMarker);
-    const icon = L.divIcon({ html: '<div class="me-pin"></div>', className: '', iconSize: [18,18], iconAnchor: [9,9] });
-    meMarker = L.marker([currentLocation.lat, currentLocation.lng], { icon }).addTo(map);
-    meMarker.bindPopup('<div class="popup-title">你在這裡</div>');
-    map.setView([currentLocation.lat, currentLocation.lng], 13);
-    document.getElementById('map-loc-status').textContent = '已定位';
-    toast('已定位你的位置');
+  // Stop any previous watcher
+  if (meWatchId != null) { try { navigator.geolocation.clearWatch(meWatchId); } catch(e) {} meWatchId = null; }
+  let firstFix = true;
+  meWatchId = navigator.geolocation.watchPosition(pos => {
+    const acc = pos.coords.accuracy;
+    currentLocation = { lat: pos.coords.latitude, lng: pos.coords.longitude, accuracy: acc };
+    placeMeMarker(currentLocation.lat, currentLocation.lng, acc);
+    document.getElementById('map-loc-status').textContent = `±${Math.round(acc)}m`;
+    if (firstFix) {
+      firstFix = false;
+      if (!opts.silent) {
+        map.setView([currentLocation.lat, currentLocation.lng], acc < 100 ? 16 : 14);
+        toast('已定位你的位置');
+      }
+    } else if (acc < (currentLocation._bestAcc || Infinity)) {
+      // Re-center only if accuracy improves significantly
+      currentLocation._bestAcc = acc;
+    }
   }, err => {
-    document.getElementById('map-loc-status').textContent = '無法取得';
-    toast('無法取得位置 · ' + (err.message || ''));
-  }, { enableHighAccuracy: true, timeout: 8000, maximumAge: 60000 });
+    if (firstFix) {
+      document.getElementById('map-loc-status').textContent = '無法取得';
+      if (!opts.silent) toast('無法取得位置 · ' + (err.message || ''));
+    }
+  }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 });
 }
 document.getElementById('map-locate').addEventListener('click', locateMe);
 document.getElementById('map-refresh').addEventListener('click', () => { renderMapPins(); toast('已重整'); });
