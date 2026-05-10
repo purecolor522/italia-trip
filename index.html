@@ -3042,6 +3042,8 @@ function buildSampleItinerary() {
 }
 
 const SAMPLE_DATA = buildSampleItinerary();
+// Bump this whenever buildSampleItinerary above changes, so unmodified viewers see the latest on next load.
+const DATA_VERSION = '2026-05-10-1';
 
 let state = loadState() || {
   trip: { startDate: defaultStart, days: 11 },
@@ -3051,7 +3053,9 @@ let state = loadState() || {
   notebooks: SAMPLE_DATA.notebooks || {},
   hiddenFromMap: {},
   rates: { ...FALLBACK_RATES },
-  ratesUpdated: null
+  ratesUpdated: null,
+  dataVersion: DATA_VERSION,
+  hasUserEdits: false
 };
 if (!state.notebooks) state.notebooks = {};
 if (!state.hiddenFromMap) state.hiddenFromMap = {};
@@ -3167,7 +3171,11 @@ let currentNotePage = 0;
 let expenseMode = 'daily'; // 'daily' or 'all'
 let mapMode = 'today'; // 'today' or 'saved'
 
-function saveState() {
+function saveState(opts) {
+  // Default: treat as a user edit. Migrations / silent updates pass { silent: true }
+  if (!opts || opts.silent !== true) {
+    state.hasUserEdits = true;
+  }
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {}
 }
 function loadState() {
@@ -5759,12 +5767,68 @@ function migrateDurationToCategory() {
   if (changed) saveState();
 }
 
+function inferUserEditsFromContent() {
+  // Used once for legacy users (those who installed before hasUserEdits flag existed).
+  // Heuristic: if any user-only data buckets have content, count as edited.
+  if ((state.expenses || []).length > 0) return true;
+  if (Object.keys(state.notebookPhotos || {}).length > 0) return true;
+  if (Object.keys(state.expensePhotos || {}).length > 0) return true;
+  if (Object.keys(state.meetingTimes || {}).length > 0) return true;
+  // Notebooks: only count entries that differ from SAMPLE_DATA.notebooks
+  const sampleNotes = SAMPLE_DATA.notebooks || {};
+  const userNotes = state.notebooks || {};
+  const noteKeys = new Set([...Object.keys(sampleNotes), ...Object.keys(userNotes)]);
+  for (const k of noteKeys) {
+    if ((sampleNotes[k] || '') !== (userNotes[k] || '')) return true;
+  }
+  // Backups: structural compare against SAMPLE_DATA.backups by id set
+  const sampleBkIds = new Set((SAMPLE_DATA.backups || []).map(b => b.id));
+  const userBks = state.backups || [];
+  if (userBks.length !== sampleBkIds.size) return true;
+  for (const b of userBks) if (!sampleBkIds.has(b.id)) return true;
+  // Itineraries: shallow id+place+time+category structural compare
+  const sampleItin = SAMPLE_DATA.itineraries || {};
+  const userItin = state.itineraries || {};
+  const itinDates = new Set([...Object.keys(sampleItin), ...Object.keys(userItin)]);
+  for (const d of itinDates) {
+    const a = sampleItin[d] || [];
+    const b = userItin[d] || [];
+    if (a.length !== b.length) return true;
+    for (let i = 0; i < a.length; i++) {
+      if (a[i].id !== b[i].id || a[i].place !== b[i].place || a[i].time !== b[i].time || a[i].category !== b[i].category) return true;
+    }
+  }
+  // Completed flags also count as edits
+  for (const d of Object.keys(userItin)) {
+    if ((userItin[d] || []).some(it => it.completed)) return true;
+  }
+  return false;
+}
+
+function maybeRefreshFromSample() {
+  // For legacy users: infer flag if missing
+  if (state.hasUserEdits == null) {
+    state.hasUserEdits = inferUserEditsFromContent();
+  }
+  if (state.dataVersion === DATA_VERSION) return;
+  if (!state.hasUserEdits) {
+    // Pristine viewer — refresh from latest SAMPLE_DATA so they see the newest itinerary
+    state.itineraries = JSON.parse(JSON.stringify(SAMPLE_DATA.itineraries));
+    state.backups = JSON.parse(JSON.stringify(SAMPLE_DATA.backups));
+    state.notebooks = JSON.parse(JSON.stringify(SAMPLE_DATA.notebooks || {}));
+  }
+  state.dataVersion = DATA_VERSION;
+  saveState({ silent: true });
+}
+
 function init() {
   populateCitySelects();
   populateBkDateSelect();
   populateTimeSelects();
   populateDurationSelect();
   populateCategorySelect();
+  // Run migrations without triggering hasUserEdits flag
+  const prevUserEdits = state.hasUserEdits;
   clearOnlySavedPinsOnce();
   migrateBackupsAddDate();
   applyPinkCategoriesFromSample();
@@ -5775,6 +5839,9 @@ function init() {
   migrateDay1HSRAndNotes();
   migrateDay2Panzerotti();
   migrateCategoryToXingcheng();
+  state.hasUserEdits = prevUserEdits; // migrations don't count as user edits
+  // Now check if SAMPLE_DATA changed since this state was last touched and refresh for pristine viewers
+  maybeRefreshFromSample();
   const dates = genDates();
   if (!dates.find(d => d.iso === currentDate)) currentDate = dates[0].iso;
   renderDateStrip();
