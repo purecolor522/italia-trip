@@ -1994,37 +1994,38 @@
     font-style: italic;
     font-size: 13.5px;
   }
-  .notebook-card .nb-photos {
-    margin-top: 8px;
-    margin-left: 14px;
-    font-size: 13px;
-    color: var(--tan-600);
-    font-family: 'Cormorant Garamond', serif;
-    font-style: italic;
-    letter-spacing: .05em;
-    display: inline-flex; align-items: center; gap: 4px;
-  }
-  .notebook-card .nb-photos svg { width: 13px; height: 13px; }
-
-  /* Photo list (in notebook modal) */
+  /* Photo list (notebook modal & home card) */
   .photo-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 8px; }
   .photo-list:empty { display: none; }
   .photo-row {
     display: flex; align-items: center; gap: 10px;
-    padding: 10px 12px;
+    padding: 8px 10px;
     background: var(--oat-50);
     border: 1px solid rgba(168, 134, 84, .2);
     border-radius: 10px;
   }
-  .photo-row .photo-icon {
-    width: 28px; height: 28px;
-    border-radius: 6px;
-    background: rgba(135, 98, 56, .12);
-    display: grid; place-items: center;
-    color: var(--tan-600);
+  .photo-thumb {
     flex-shrink: 0;
+    width: 44px !important;
+    height: 44px !important;
+    border-radius: 8px;
+    background-color: rgba(135, 98, 56, .12);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    cursor: pointer;
+    overflow: hidden;
+    position: relative;
   }
-  .photo-row .photo-icon svg { width: 16px; height: 16px; }
+  .photo-thumb.loading::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, rgba(135,98,56,.06), rgba(135,98,56,.18), rgba(135,98,56,.06));
+    background-size: 200% 100%;
+    animation: thumbShimmer 1.2s linear infinite;
+  }
+  @keyframes thumbShimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
   .photo-row .photo-name {
     flex: 1;
     font-size: 14px;
@@ -2044,7 +2045,9 @@
     cursor: pointer;
   }
   .photo-row .photo-del:active { background: rgba(200, 116, 92, .12); color: var(--accent-rose); }
-  .photo-row .photo-del svg { width: 14px; height: 14px; }
+  .photo-row .photo-del svg { width: 14px !important; height: 14px !important; }
+  .notebook-card .photo-list { margin-top: 10px; margin-left: 14px; }
+  .notebook-card-mini .photo-list { margin-top: 8px; margin-left: 14px; }
 
   .btn-add-photo {
     width: 100%;
@@ -3081,6 +3084,55 @@ async function deletePhotoBlob(id) {
   });
 }
 
+/* Lifecycle-managed object URLs for thumbnails */
+const _thumbUrlCache = new Map(); // id -> objectURL
+function revokeAllThumbUrls() {
+  for (const url of _thumbUrlCache.values()) {
+    try { URL.revokeObjectURL(url); } catch (e) {}
+  }
+  _thumbUrlCache.clear();
+}
+async function hydrateThumbs(rootEl) {
+  if (!rootEl) return;
+  const els = rootEl.querySelectorAll('.photo-thumb[data-photo-id]');
+  for (const el of els) {
+    const id = el.dataset.photoId;
+    if (!id) continue;
+    if (_thumbUrlCache.has(id)) {
+      el.style.backgroundImage = `url("${_thumbUrlCache.get(id)}")`;
+      el.classList.remove('loading');
+      continue;
+    }
+    try {
+      const blob = await getPhotoBlob(id);
+      if (!blob) { el.classList.remove('loading'); continue; }
+      const url = URL.createObjectURL(blob);
+      _thumbUrlCache.set(id, url);
+      el.style.backgroundImage = `url("${url}")`;
+      el.classList.remove('loading');
+    } catch (e) {
+      el.classList.remove('loading');
+    }
+  }
+}
+function renderPhotoRowsHTML(photos, opts) {
+  opts = opts || {};
+  if (!photos || !photos.length) return '';
+  const rows = photos.map(p => {
+    const del = opts.deletable
+      ? `<button type="button" class="photo-del" onclick="event.stopPropagation(); removeNotebookPhoto('${escape(opts.date)}','${p.id}')" aria-label="刪除">
+           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+         </button>`
+      : '';
+    return `<div class="photo-row">
+      <div class="photo-thumb loading" data-photo-id="${p.id}" onclick="event.stopPropagation(); viewNotebookPhoto('${p.id}')"></div>
+      <div class="photo-name" onclick="event.stopPropagation(); viewNotebookPhoto('${p.id}')">${escape(p.filename)}</div>
+      ${del}
+    </div>`;
+  }).join('');
+  return `<div class="photo-list">${rows}</div>`;
+}
+
 let currentDate = state.trip.startDate;
 let currentPage = 'home';
 let editingItinId = null;
@@ -3380,12 +3432,13 @@ function renderItinerary() {
         </div>
       </div>
       <div class="nb-content ${noteText ? '' : 'empty'}">${noteText ? escape(noteText) : (notePhotos.length ? '（僅照片）' : '尚未記錄 — 點擊這裡寫下今天的心情、想吃的、買到的、有趣的見聞...')}</div>
-      ${notePhotos.length ? `<div class="nb-photos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg> ${notePhotos.length} 張照片</div>` : ''}
+      ${renderPhotoRowsHTML(notePhotos, { deletable: false })}
     </div>
   `;
   list.innerHTML = html;
   renderWeatherForDay();
   setupSwipeOnCards();
+  hydrateThumbs(list);
 }
 
 window.navigateTo = function(id) {
@@ -3848,17 +3901,17 @@ function renderNotebookPhotoList(date) {
   const list = document.getElementById('notebook-photo-list');
   const photos = (state.notebookPhotos && state.notebookPhotos[date]) || [];
   if (!photos.length) { list.innerHTML = ''; return; }
+  // Reuse the shared rows; the inner .photo-list wrapper isn't needed here since this container is already the list.
   list.innerHTML = photos.map(p => `
     <div class="photo-row">
-      <div class="photo-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
-      </div>
+      <div class="photo-thumb loading" data-photo-id="${p.id}" onclick="viewNotebookPhoto('${p.id}')"></div>
       <div class="photo-name" onclick="viewNotebookPhoto('${p.id}')">${escape(p.filename)}</div>
       <button type="button" class="photo-del" onclick="removeNotebookPhoto('${escape(date)}','${p.id}')" aria-label="刪除">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
       </button>
     </div>
   `).join('');
+  hydrateThumbs(list);
 }
 
 document.getElementById('notebook-add-photo').addEventListener('click', () => {
@@ -3923,6 +3976,10 @@ document.querySelector('.photo-viewer-close').addEventListener('click', closePho
 window.removeNotebookPhoto = async function(date, id) {
   if (!confirm('要刪除這張照片嗎？此操作無法復原。')) return;
   try { await deletePhotoBlob(id); } catch (e) {}
+  if (_thumbUrlCache.has(id)) {
+    try { URL.revokeObjectURL(_thumbUrlCache.get(id)); } catch (e) {}
+    _thumbUrlCache.delete(id);
+  }
   if (state.notebookPhotos[date]) {
     state.notebookPhotos[date] = state.notebookPhotos[date].filter(p => p.id !== id);
     if (!state.notebookPhotos[date].length) delete state.notebookPhotos[date];
@@ -3930,6 +3987,7 @@ window.removeNotebookPhoto = async function(date, id) {
   saveState();
   renderNotebookPhotoList(date);
   if (currentPage === 'itinerary') renderItinerary();
+  if (currentPage === 'notes') renderNotePage();
   toast('已刪除照片');
 };
 
@@ -4733,7 +4791,7 @@ function renderNotebookList() {
   const content = (state.notebooks && state.notebooks[currentDate]) || '';
   const photos = (state.notebookPhotos && state.notebookPhotos[currentDate]) || [];
   const hasContent = content.trim() || photos.length;
-  const photoBadge = photos.length ? `<div class="nb-photos" style="margin-top:6px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg> ${photos.length} 張照片</div>` : '';
+  const photoBadge = renderPhotoRowsHTML(photos, { deletable: false });
 
   let html = `
     <div class="section-label" style="margin-top: 22px;">
@@ -4768,6 +4826,7 @@ function renderNotebookList() {
     `;
   }
   section.innerHTML = html;
+  hydrateThumbs(section);
 }
 window.addBkToItin = function(id) {
   const b = state.backups.find(x => x.id === id);
