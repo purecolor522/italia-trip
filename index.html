@@ -1994,6 +1994,106 @@
     font-style: italic;
     font-size: 13.5px;
   }
+  .notebook-card .nb-photos {
+    margin-top: 8px;
+    margin-left: 14px;
+    font-size: 13px;
+    color: var(--tan-600);
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    letter-spacing: .05em;
+    display: inline-flex; align-items: center; gap: 4px;
+  }
+  .notebook-card .nb-photos svg { width: 13px; height: 13px; }
+
+  /* Photo list (in notebook modal) */
+  .photo-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 8px; }
+  .photo-list:empty { display: none; }
+  .photo-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 12px;
+    background: var(--oat-50);
+    border: 1px solid rgba(168, 134, 84, .2);
+    border-radius: 10px;
+  }
+  .photo-row .photo-icon {
+    width: 28px; height: 28px;
+    border-radius: 6px;
+    background: rgba(135, 98, 56, .12);
+    display: grid; place-items: center;
+    color: var(--tan-600);
+    flex-shrink: 0;
+  }
+  .photo-row .photo-icon svg { width: 16px; height: 16px; }
+  .photo-row .photo-name {
+    flex: 1;
+    font-size: 14px;
+    color: var(--ink-700);
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    cursor: pointer;
+    user-select: none;
+  }
+  .photo-row .photo-name:active { color: var(--tan-600); }
+  .photo-row .photo-del {
+    flex-shrink: 0;
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--ink-500);
+    display: grid; place-items: center;
+    cursor: pointer;
+  }
+  .photo-row .photo-del:active { background: rgba(200, 116, 92, .12); color: var(--accent-rose); }
+  .photo-row .photo-del svg { width: 14px; height: 14px; }
+
+  .btn-add-photo {
+    width: 100%;
+    padding: 10px 14px;
+    background: var(--oat-50);
+    border: 1px dashed rgba(168, 134, 84, .4);
+    border-radius: 10px;
+    color: var(--tan-600);
+    font-size: 14px;
+    font-weight: 500;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    cursor: pointer;
+  }
+  .btn-add-photo:active { background: var(--oat-100); }
+
+  /* Fullscreen photo viewer */
+  .photo-viewer {
+    position: fixed;
+    inset: 0;
+    background: rgba(20, 16, 10, 0.92);
+    display: none;
+    align-items: center; justify-content: center;
+    z-index: 9999;
+    padding: 20px;
+    padding-top: max(20px, var(--safe-top));
+    padding-bottom: max(20px, var(--safe-bottom));
+  }
+  .photo-viewer.active { display: flex; }
+  .photo-viewer img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    border-radius: 4px;
+    box-shadow: 0 20px 60px rgba(0,0,0,.5);
+  }
+  .photo-viewer-close {
+    position: absolute;
+    top: max(16px, calc(var(--safe-top) + 8px));
+    right: 16px;
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, .15);
+    backdrop-filter: blur(6px);
+    color: #fff;
+    display: grid; place-items: center;
+    cursor: pointer;
+    z-index: 1;
+  }
+  .photo-viewer-close svg { width: 20px; height: 20px; }
 
   /* Content slider (range under tabs) */
   .content-slider {
@@ -2618,8 +2718,24 @@
       <label>自由填寫 <span class="en">Free Text</span></label>
       <textarea id="notebook-text" rows="9" placeholder="記下今天的心情、想吃的、買到的、有趣的見聞..." style="font-size: 16px; line-height: 1.7;"></textarea>
     </div>
+    <div class="field">
+      <label>照片 <span class="en">Photos</span></label>
+      <div class="photo-list" id="notebook-photo-list"></div>
+      <button type="button" class="btn-add-photo" id="notebook-add-photo">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+        新增照片
+      </button>
+      <input type="file" id="notebook-file-input" accept="image/*" multiple style="display:none">
+    </div>
     <button class="btn btn-primary" id="notebook-save">儲存筆記</button>
   </div>
+</div>
+
+<div class="photo-viewer" id="photo-viewer">
+  <button class="photo-viewer-close" type="button" aria-label="關閉">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+  </button>
+  <img id="photo-viewer-img" alt="">
 </div>
 
 <div class="modal-backdrop" id="flight-modal">
@@ -2919,6 +3035,51 @@ let state = loadState() || {
 if (!state.notebooks) state.notebooks = {};
 if (!state.hiddenFromMap) state.hiddenFromMap = {};
 if (!state.meetingTimes) state.meetingTimes = {};
+if (!state.notebookPhotos) state.notebookPhotos = {};
+
+/* ===== IndexedDB for notebook photos ===== */
+const PHOTO_DB = 'italia_photos_v1';
+const PHOTO_STORE = 'photos';
+let _photoDB = null;
+function openPhotoDB() {
+  if (_photoDB) return Promise.resolve(_photoDB);
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(PHOTO_DB, 1);
+    req.onupgradeneeded = (e) => {
+      const db = e.target.result;
+      if (!db.objectStoreNames.contains(PHOTO_STORE)) db.createObjectStore(PHOTO_STORE);
+    };
+    req.onsuccess = () => { _photoDB = req.result; resolve(_photoDB); };
+    req.onerror = () => reject(req.error);
+  });
+}
+async function putPhotoBlob(id, blob) {
+  const db = await openPhotoDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(PHOTO_STORE, 'readwrite');
+    tx.objectStore(PHOTO_STORE).put(blob, id);
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  });
+}
+async function getPhotoBlob(id) {
+  const db = await openPhotoDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(PHOTO_STORE, 'readonly');
+    const req = tx.objectStore(PHOTO_STORE).get(id);
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+async function deletePhotoBlob(id) {
+  const db = await openPhotoDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(PHOTO_STORE, 'readwrite');
+    tx.objectStore(PHOTO_STORE).delete(id);
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  });
+}
 
 let currentDate = state.trip.startDate;
 let currentPage = 'home';
@@ -3204,6 +3365,8 @@ function renderItinerary() {
   }
   // Notebook card always at the bottom
   const noteText = state.notebooks[currentDate] || '';
+  const notePhotos = (state.notebookPhotos && state.notebookPhotos[currentDate]) || [];
+  const hasContent = noteText || notePhotos.length;
   html += `
     <div class="notebook-card" onclick="openNotebookModal()">
       <div class="nb-head">
@@ -3212,11 +3375,12 @@ function renderItinerary() {
           今日筆記
         </div>
         <div class="nb-edit">
-          ${noteText ? '編輯' : '點擊撰寫'}
+          ${hasContent ? '編輯' : '點擊撰寫'}
           <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>
         </div>
       </div>
-      <div class="nb-content ${noteText ? '' : 'empty'}">${noteText ? escape(noteText) : '尚未記錄 — 點擊這裡寫下今天的心情、想吃的、買到的、有趣的見聞...'}</div>
+      <div class="nb-content ${noteText ? '' : 'empty'}">${noteText ? escape(noteText) : (notePhotos.length ? '（僅照片）' : '尚未記錄 — 點擊這裡寫下今天的心情、想吃的、買到的、有趣的見聞...')}</div>
+      ${notePhotos.length ? `<div class="nb-photos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg> ${notePhotos.length} 張照片</div>` : ''}
     </div>
   `;
   list.innerHTML = html;
@@ -3675,9 +3839,99 @@ function openNotebookModal(targetDate) {
   document.getElementById('notebook-modal-date').textContent = label + ' · 自由筆記';
   document.getElementById('notebook-text').value = state.notebooks[date] || '';
   document.getElementById('notebook-modal').dataset.targetDate = date;
+  renderNotebookPhotoList(date);
   openModal('notebook-modal');
 }
 window.openNotebookModal = openNotebookModal;
+
+function renderNotebookPhotoList(date) {
+  const list = document.getElementById('notebook-photo-list');
+  const photos = (state.notebookPhotos && state.notebookPhotos[date]) || [];
+  if (!photos.length) { list.innerHTML = ''; return; }
+  list.innerHTML = photos.map(p => `
+    <div class="photo-row">
+      <div class="photo-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+      </div>
+      <div class="photo-name" onclick="viewNotebookPhoto('${p.id}')">${escape(p.filename)}</div>
+      <button type="button" class="photo-del" onclick="removeNotebookPhoto('${escape(date)}','${p.id}')" aria-label="刪除">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+  `).join('');
+}
+
+document.getElementById('notebook-add-photo').addEventListener('click', () => {
+  document.getElementById('notebook-file-input').click();
+});
+
+document.getElementById('notebook-file-input').addEventListener('change', async (e) => {
+  const files = Array.from(e.target.files || []);
+  const date = document.getElementById('notebook-modal').dataset.targetDate || currentDate;
+  if (!files.length) return;
+  state.notebookPhotos[date] = state.notebookPhotos[date] || [];
+  for (const file of files) {
+    if (!file.type.startsWith('image/')) continue;
+    const id = uid();
+    try {
+      await putPhotoBlob(id, file);
+      state.notebookPhotos[date].push({
+        id,
+        filename: file.name || `photo-${Date.now()}.jpg`,
+        addedAt: Date.now()
+      });
+    } catch (err) {
+      toast('照片儲存失敗 · ' + (err.message || ''));
+    }
+  }
+  saveState();
+  renderNotebookPhotoList(date);
+  e.target.value = ''; // allow re-selecting same file
+  toast(`已新增 ${files.length} 張照片`);
+});
+
+window.viewNotebookPhoto = async function(id) {
+  try {
+    const blob = await getPhotoBlob(id);
+    if (!blob) { toast('照片找不到'); return; }
+    const url = URL.createObjectURL(blob);
+    const viewer = document.getElementById('photo-viewer');
+    const img = document.getElementById('photo-viewer-img');
+    img.dataset.objectUrl = url;
+    img.src = url;
+    viewer.classList.add('active');
+  } catch (err) {
+    toast('無法開啟照片');
+  }
+};
+
+function closePhotoViewer() {
+  const viewer = document.getElementById('photo-viewer');
+  const img = document.getElementById('photo-viewer-img');
+  viewer.classList.remove('active');
+  if (img.dataset.objectUrl) {
+    URL.revokeObjectURL(img.dataset.objectUrl);
+    delete img.dataset.objectUrl;
+  }
+  img.src = '';
+}
+document.getElementById('photo-viewer').addEventListener('click', (e) => {
+  if (e.target.id === 'photo-viewer' || e.target.tagName === 'IMG') closePhotoViewer();
+});
+document.querySelector('.photo-viewer-close').addEventListener('click', closePhotoViewer);
+
+window.removeNotebookPhoto = async function(date, id) {
+  if (!confirm('要刪除這張照片嗎？此操作無法復原。')) return;
+  try { await deletePhotoBlob(id); } catch (e) {}
+  if (state.notebookPhotos[date]) {
+    state.notebookPhotos[date] = state.notebookPhotos[date].filter(p => p.id !== id);
+    if (!state.notebookPhotos[date].length) delete state.notebookPhotos[date];
+  }
+  saveState();
+  renderNotebookPhotoList(date);
+  if (currentPage === 'itinerary') renderItinerary();
+  toast('已刪除照片');
+};
 
 function saveNotebook() {
   const targetDate = document.getElementById('notebook-modal').dataset.targetDate || currentDate;
@@ -3691,6 +3945,7 @@ function saveNotebook() {
   closeModal('notebook-modal');
   if (currentPage === 'itinerary') renderItinerary();
   if (currentPage === 'backup') renderBackups();
+  if (currentPage === 'notes') renderNotePage();
   toast('筆記已儲存');
 }
 document.getElementById('notebook-save').addEventListener('click', saveNotebook);
@@ -4476,6 +4731,9 @@ function renderNotebookList() {
   const dayLabel = idx >= 0 ? `D${idx + 1}` : '';
   const dateLabel = `${dateObj.getMonth()+1}/${dateObj.getDate()} 週${dow}`;
   const content = (state.notebooks && state.notebooks[currentDate]) || '';
+  const photos = (state.notebookPhotos && state.notebookPhotos[currentDate]) || [];
+  const hasContent = content.trim() || photos.length;
+  const photoBadge = photos.length ? `<div class="nb-photos" style="margin-top:6px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg> ${photos.length} 張照片</div>` : '';
 
   let html = `
     <div class="section-label" style="margin-top: 22px;">
@@ -4483,7 +4741,7 @@ function renderNotebookList() {
       <span class="en">${dayLabel} · ${dateLabel}</span>
     </div>
   `;
-  if (content && content.trim()) {
+  if (hasContent) {
     html += `
       <div class="notebook-grid">
         <div class="notebook-card-mini" onclick="openNotebookModal('${currentDate}')">
@@ -4491,7 +4749,8 @@ function renderNotebookList() {
             <span class="nb-label">${dayLabel ? `<span class="day-num">${dayLabel}</span>` : ''}${dateLabel}</span>
             <span class="nb-edit-icon">EDIT ›</span>
           </div>
-          <div class="nb-text">${escape(content)}</div>
+          <div class="nb-text">${content.trim() ? escape(content) : '（僅照片）'}</div>
+          ${photoBadge}
         </div>
       </div>
     `;
