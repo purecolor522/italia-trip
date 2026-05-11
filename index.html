@@ -3047,6 +3047,14 @@ function buildSampleItinerary() {
     { id: "mozytgryd4rfk0", name: "Vino vino Osteria餐廳", city: "Venezia", date: "2026-05-17", notes: "11:30-23:30\nCalle del Caffettier, 2007A, 30100 Venezia VE", pinColor: "black" },
     { id: "mozz324283q6mv", name: "Al Grill 餐廳", city: "Venezia", date: "2026-05-17", notes: "Per S. Marco, 1659B, 30124 Venezia VE", pinColor: "black" },
     { id: "mozz9ul3toazuj", name: "Venchi gelato", city: "Venezia", date: "2026-05-17", pinColor: "black" },
+    { id: "venezia_misericordia_001", name: "Trattoria Misericordia", city: "Venezia", date: "2026-05-17", notes: "★4.4 · 2800 reviews · €22-28 · Cannaregio 運河旁傳統小館，墨魚麵與威尼斯海鮮 · 台灣部落客愛莉莎莎、小林郭郭推薦 · Cannaregio, 2515, Fondamenta Misericordia, 30121 Venezia VE", pinColor: "black" },
+    { id: "venezia_santrovaso_001", name: "Taverna San Trovaso", city: "Venezia", date: "2026-05-17", notes: "★4.3 · 5200 reviews · €20-26 · Dorsoduro 老字號 trattoria · 海鮮義大利麵、提拉米蘇 · 行走CD流浪記推薦 · Fondamenta Priuli, Dorsoduro 1016, 30123 Venezia VE", pinColor: "black" },
+    { id: "venezia_rivetta_001", name: "Trattoria alla Rivetta", city: "Venezia", date: "2026-05-17", notes: "★4.2 · 1500 reviews · €22-28 · 貢多拉船夫午餐都來這吃 · 新鮮墨魚麵 €12 起 · OneOne 食旅日常推薦 · Castello 4625, Ponte San Provolo, 30122 Venezia VE", pinColor: "black" },
+    { id: "venezia_lacorte_001", name: "Birraria La Corte", city: "Venezia", date: "2026-05-17", notes: "★4.3 · 3800 reviews · €20-28 · Campo San Polo 廣場 · 那不勒斯披薩 + 威尼斯傳統菜 · 有戶外座位 · Campo San Polo 2168, 30125 Venezia VE", pinColor: "black" },
+    { id: "venezia_dalmoros_001", name: "Dal Moro's Fresh Pasta to Go", city: "Venezia", date: "2026-05-17", notes: "★4.5 · 8000+ reviews · €6-8 · 外帶手工新鮮義大利麵盒裝 €5.5–€7 · 老闆會說中文 · 黛西、AJ、噗舞、Yoga Jenny 都推薦 · Calle de la Casseleria 5324, 30122 Venezia VE", pinColor: "pink" },
+    { id: "venezia_tonolo_001", name: "Pasticceria Tonolo", city: "Venezia", date: "2026-05-17", notes: "★4.6 · 4300 reviews · €4-7 · 1886 年百年甜點店 · 開心果/巧克力奶油泡芙、提拉米蘇 · 咖啡+甜點站著吃約 €3–€5 · Calle San Pantalon 3764, 30123 Venezia VE", pinColor: "pink" },
+    { id: "venezia_schiavi_001", name: "Cantine del Vino già Schiavi", city: "Venezia", date: "2026-05-17", notes: "★4.7 · 2650 reviews · €5-8 · Dorsoduro 運河邊百年 bacaro · 創意 cicchetti €1.5–€2/個 · Nico 妮喃小語推薦 · Fondamenta Nani, Dorsoduro 992, 30123 Venezia VE", pinColor: "pink" },
+    { id: "venezia_anticoforno_001", name: "Antico Forno", city: "Venezia", date: "2026-05-17", notes: "★4.7 · 3200 reviews · €4-7 · Rialto 市場旁人氣 pizza al taglio 切片披薩 · 一片 €3–€5 · San Polo 973, Rugheta del Ravano, 30125 Venezia VE", pinColor: "pink" },
   ];
   const notebooks = {};
   notebooks["2026-05-15"] = "桃園機場";
@@ -3060,7 +3068,7 @@ function buildSampleItinerary() {
 
 const SAMPLE_DATA = buildSampleItinerary();
 // Bump this whenever buildSampleItinerary above changes, so unmodified viewers see the latest on next load.
-const DATA_VERSION = '2026-05-11-6';
+const DATA_VERSION = '2026-05-11-7';
 
 let state = loadState() || {
   trip: { startDate: defaultStart, days: 11 },
@@ -5646,6 +5654,33 @@ function migrateAddOriginalNames_v1() {
   saveState({ silent: true });
 }
 
+function migrateAddVeneziaRestaurants_v1() {
+  if (state._venezia_restaurants_v1) return;
+  const TARGET_IDS = [
+    'venezia_misericordia_001',
+    'venezia_santrovaso_001',
+    'venezia_rivetta_001',
+    'venezia_lacorte_001',
+    'venezia_dalmoros_001',
+    'venezia_tonolo_001',
+    'venezia_schiavi_001',
+    'venezia_anticoforno_001'
+  ];
+  state.backups = state.backups || [];
+  const existingIds = new Set(state.backups.map(b => b.id));
+  const sampleById = new Map((SAMPLE_DATA.backups || []).map(b => [b.id, b]));
+  TARGET_IDS.forEach(id => {
+    if (!existingIds.has(id)) {
+      const sample = sampleById.get(id);
+      if (sample) {
+        state.backups.push({ ...sample });
+      }
+    }
+  });
+  state._venezia_restaurants_v1 = true;
+  saveState({ silent: true });
+}
+
 function migrateCategoryToXingcheng() {
   if (state._cat_xc_v1) return;
   const KEEP = new Set(['船程','航班','集合','必逛必吃','早餐','午餐','晚餐','精品','自由活動','住宿','出境','入境']);
@@ -5903,6 +5938,7 @@ function init() {
   migrateCategoryToXingcheng();
   migrateAddOriginalNames_v1();
   migrateBackupsFromItineraryFlag_v1();
+  migrateAddVeneziaRestaurants_v1();
   state.hasUserEdits = prevUserEdits; // migrations don't count as user edits
   // Now check if SAMPLE_DATA changed since this state was last touched and refresh for pristine viewers
   maybeRefreshFromSample();
