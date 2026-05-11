@@ -1042,6 +1042,7 @@
   }
   .map-pin span { transform: rotate(45deg); color: var(--oat-100); font-family: 'Cormorant Garamond', serif; font-size: 14px; font-weight: 600; }
   .map-pin.saved { background: var(--accent-rose); }
+  .map-pin.manual { background: var(--ink-500); }
   .me-pin {
     width: 18px; height: 18px;
     background: var(--accent-rose);
@@ -1091,6 +1092,7 @@
     box-shadow: 0 1px 3px rgba(0,0,0,.15);
   }
   .legend-pin.red { background: var(--accent-rose); }
+  .legend-pin.grey { background: var(--ink-500); }
   .trip-info-row .dropdown-trigger {
     background: transparent;
     border: none;
@@ -1166,6 +1168,7 @@
     flex: 0 0 auto;
   }
   .pin-list-item .pin-num.saved { background: var(--accent-rose); }
+  .pin-list-item .pin-num.manual { background: var(--ink-500); }
   .pin-list-item .pin-name {
     flex: 1;
     font-size: 14px;
@@ -2430,6 +2433,10 @@
           <span class="legend-pin red"></span>
           <span>必逛必吃／精品</span>
         </div>
+        <div class="legend-item">
+          <span class="legend-pin grey"></span>
+          <span>備用景點</span>
+        </div>
       </div>
       <div id="map-container">
         <div id="map"></div>
@@ -3088,7 +3095,7 @@ function buildSampleItinerary() {
 
 const SAMPLE_DATA = buildSampleItinerary();
 // Bump this whenever buildSampleItinerary above changes, so unmodified viewers see the latest on next load.
-const DATA_VERSION = '2026-05-11-8';
+const DATA_VERSION = '2026-05-11-9';
 
 let state = loadState() || {
   trip: { startDate: defaultStart, days: 11 },
@@ -4243,9 +4250,10 @@ async function renderMapPins() {
     // Persist real coords on the backup so the map shows the same point next time
     if (!coord._fallback && (b.lat == null || b.lng == null)) {
       b.lat = coord.lat; b.lng = coord.lng;
-      saveState();
+      saveState({ silent: true });
     }
-    const colorClass = b.pinColor === 'pink' ? 'saved' : '';
+    // Pin color priority: manual (not from itinerary) → grey; else pink for saved, black default
+    const colorClass = !b.fromItinerary ? 'manual' : (b.pinColor === 'pink' ? 'saved' : '');
     const html = `<div class="map-pin ${colorClass}"><span>★</span></div>`;
     const icon = L.divIcon({ html, className: '', iconSize: [32, 40], iconAnchor: [16, 38] });
     const marker = L.marker([coord.lat, coord.lng], { icon }).addTo(map);
@@ -4458,7 +4466,7 @@ function renderPinListDropdown() {
   if (savedItems.length > 0) {
     html += '<div class="pin-list-section"><h5>已加入地圖</h5>';
     savedItems.forEach(b => {
-      const colorClass = b.pinColor === 'pink' ? 'saved' : '';
+      const colorClass = !b.fromItinerary ? 'manual' : (b.pinColor === 'pink' ? 'saved' : '');
       html += `
         <button class="pin-list-item" type="button" onclick="flyToPin('${b.id}')">
           <span class="pin-num ${colorClass}">★</span>
