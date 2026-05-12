@@ -3082,6 +3082,87 @@ function buildSampleItinerary() {
     { id: "firenze_deineri_001", name: "Gelateria dei Neri", city: "Firenze", date: "2026-05-19", notes: "★4.6 · 14000+ reviews · €3-6 · 與 Vivoli 同家族但更平價 · 40 款口味 · 芝麻、無花果瑞可塔、Crema dei Neri 招牌 · Via dei Neri, 9/11r, 50122 Firenze FI", pinColor: "pink" },
     { id: "firenze_edoardo_001", name: "Gelateria Edoardo Il Gelato Biologico", city: "Firenze", date: "2026-05-19", notes: "★4.6 · 4500+ reviews · €3-7 · 百花大教堂後方 · 有機原料與每日現做脆筒 · 玫瑰、開心果招牌 · Piazza del Duomo, 45r, 50122 Firenze FI", pinColor: "pink" },
     { id: "firenze_percheno_001", name: "Perché No!...", city: "Firenze", date: "2026-05-19", notes: "★4.5 · 6400+ reviews · €3-6 · 1939 年創立 · 佛羅倫斯第一家用電力冷凍的 gelateria · 肉桂、米布丁、玫瑰花瓣招牌 · Via dei Tavolini, 19r, 50122 Firenze FI", pinColor: "pink" },
+    { id: "milano_cavalli_001", name: "Cavalli e Nastri (Brera)", city: "Milano", date: "2026-05-16", notes: "★4.5 ★ · 350+ reviews · €50-300 · 米蘭最具代表性高質感古著選物店 · Hermès/Gucci/Chanel 二手精品 · taste-of-milano、CiaoSanbo 推 · Via Brera, 2, 20121 Milano MI", pinColor: "pink" },
+    { id: "milano_marvis_001", name: "Marvis Flagship", city: "Milano", date: "2026-05-16", notes: "★4.6 ★ · 400+ reviews · €8-20 · 義大利國民精品牙膏米蘭旗艦 · 多款限定口味與禮盒 · 小卡的美麗日誌推 · Via Gesù, 3, 20121 Milano MI", pinColor: "pink" },
+    { id: "milano_10corsocomo_001", name: "10 Corso Como", city: "Milano", date: "2026-05-16", notes: "★4.4 ★ · 4200+ reviews · €30-500 · 米蘭傳奇複合選物店 · 服飾/藝廊/書店/設計 · 米蘭文青地標 · Corso Como, 10, 20154 Milano MI", pinColor: "pink" },
+    { id: "milano_profumobrera_001", name: "Profumo (Brera 香水店)", city: "Milano", date: "2026-05-16", notes: "★4.7 ★ · 320+ reviews · €80-250 · Brera 區獨立 niche 義法香水選物 · CiaoSanbo 珊寶日常推 · Via Brera, 6, 20121 Milano MI", pinColor: "pink" },
+    { id: "milano_fabriano_001", name: "Fabriano Boutique Milano", city: "Milano", date: "2026-05-16", notes: "★4.6 ★ · 380+ reviews · €10-80 · 義大利百年手工紙品文具品牌米蘭旗艦 · 皮革筆記本紙品控必朝聖 · Via Solferino, 4, 20121 Milano MI", pinColor: "pink" },
+    { id: "milano_spontini_001", name: "Pizzeria Spontini (Duomo)", city: "Milano", date: "2026-05-16", notes: "★4.4 ★ · 7800+ reviews · €5-12 · 米蘭厚片披薩名店 · 起司瀑布招牌切片 · Nico 妮喃小語推 · Via Santa Radegonda, 11, 20121 Milano MI", pinColor: "black" },
+    { id: "milano_desantis_001", name: "De Santis (Sandwich Brera)", city: "Milano", date: "2026-05-16", notes: "★4.5 ★ · 2300+ reviews · €7-12 · 米蘭老牌手工三明治 · 150+ 種組合自由配 · Medium 米蘭佳餚文推 · Corso Magenta, 9, 20123 Milano MI", pinColor: "black" },
+    { id: "milano_anticovinaio_001", name: "All'Antico Vinaio Milano", city: "Milano", date: "2026-05-16", notes: "★4.5 ★ · 4500+ reviews · €8-14 · 佛羅倫斯爆紅 Schiacciata 巨無霸三明治分店 · BringYou、Nico 妮喃小語推 · Via Dante, 14, 20121 Milano MI", pinColor: "black" },
+    { id: "milano_princi_001", name: "Princi (Piazza XXV Aprile)", city: "Milano", date: "2026-05-16", notes: "★4.4 ★ · 1800+ reviews · €5-15 · 米蘭烘焙傳奇 · 現烤披薩切片/Focaccia/糕點 · 珊寶日常推 · Largo La Foppa, 2, 20121 Milano MI", pinColor: "black" },
+    { id: "milano_dellamusica_001", name: "Gelateria della Musica", city: "Milano", date: "2026-05-16", notes: "★4.6 ★ · 2400+ reviews · €3-6 · Navigli 南邊在地人最愛手工 gelato · 每日限量出爐 · 安如設計/JC 愛旅誌推 · Via Lorenzo Valla, 8, 20141 Milano MI", pinColor: "pink" },
+    { id: "milano_biancolatte_001", name: "Bianco Latte", city: "Milano", date: "2026-05-16", notes: "★4.6 ★ · 1900+ reviews · €4-7 · Brera 北邊在地秘店 · 當季食材限量手工 · JC 愛旅誌推 · Via Filippo Turati, 30, 20121 Milano MI", pinColor: "pink" },
+    { id: "milano_laromana_001", name: "Gelateria La Romana (Navigli)", city: "Milano", date: "2026-05-16", notes: "★4.6 ★ · 2800+ reviews · €3-6 · Navigli 運河邊熱門連鎖手工冰 · 鮮奶油可無限加 · CiaoSanbo 珊寶日常推 · Alzaia Naviglio Pavese, 2, 20143 Milano MI", pinColor: "pink" },
+    { id: "milano_cioccolatitaliani_001", name: "Cioccolatitaliani (Duomo)", city: "Milano", date: "2026-05-16", notes: "★4.4 ★ · 5500+ reviews · €4-8 · 巧克力杯裝 gelato 創始店 · 可可控必訪 · Nico 妮喃小語推 · Via San Raffaele, 6, 20121 Milano MI", pinColor: "pink" },
+    { id: "bologna_tamburini_001", name: "Tamburini Bottega", city: "Bologna", date: "2026-05-18", notes: "★4.5 ★ · 4200+ reviews · €10-40 · 波隆那 Quadrilatero 老城代表食品選物店 · 火腿/起司/橄欖油禮盒一站購齊 · 嗯嗯莉莉嗯推 · Via Caprarie, 1, 40124 Bologna BO", pinColor: "pink" },
+    { id: "bologna_majani_001", name: "Majani 1796", city: "Bologna", date: "2026-05-18", notes: "★4.7 ★ · 600+ reviews · €10-30 · 1796 年義大利最古老巧克力店之一 · 招牌 Scorza · Google 高分當地名店 · Via de' Carbonesi, 5, 40123 Bologna BO", pinColor: "pink" },
+    { id: "bologna_mercatoerbe_001", name: "Mercato delle Erbe", city: "Bologna", date: "2026-05-18", notes: "★4.4 ★ · 7800+ reviews · €5-20 · 波隆那室內市場 · 蔬果起司火腿手工小物 · travelwithmiya/Nico 推 · Via Ugo Bassi, 25, 40121 Bologna BO", pinColor: "pink" },
+    { id: "bologna_dersut_001", name: "Bottega del Caffè Dersut", city: "Bologna", date: "2026-05-18", notes: "★4.6 ★ · 380+ reviews · €5-25 · Quadrilatero 老城手工咖啡與器皿選物 · Google 高分當地名店 · Via Drapperie, 6, 40124 Bologna BO", pinColor: "pink" },
+    { id: "pisa_profumopisano_001", name: "La Bottega del Profumo Pisano", city: "Pisa", date: "2026-05-18", notes: "★4.6 ★ · 320+ reviews · €30-120 · Pisa 主要徒步區 Borgo Stretto 獨立香水選物 · Google 高分當地名店 · Borgo Stretto, 56, 56127 Pisa PI", pinColor: "pink" },
+    { id: "bologna_orsa_001", name: "Osteria dell'Orsa", city: "Bologna", date: "2026-05-18", notes: "★4.4 ★ · 11000+ reviews · €10-15 · 波隆那大學區人氣 osteria · 肉醬麵/Tagliatelle 平價道地 · 愛玩小圍裙/Nico 推 · Via Mentana, 1/F, 40126 Bologna BO", pinColor: "black" },
+    { id: "bologna_sfogliarina_001", name: "Sfoglia Rina", city: "Bologna", date: "2026-05-18", notes: "★4.4 ★ · 4300+ reviews · €10-15 · 波隆那手工新鮮義麵 · 現桿 Tortellini/Tagliatelle · Nico/寶兒推 · Via Castiglione, 5/B, 40124 Bologna BO", pinColor: "black" },
+    { id: "bologna_momortadella_001", name: "Mo' Mortadella Lab", city: "Bologna", date: "2026-05-18", notes: "★4.5 ★ · 1200+ reviews · €6-12 · 波隆那 Mortadella 大腸三明治專門 · 份量大平價 · 嗯嗯莉莉嗯推 · Via dell'Indipendenza, 51A/3, 40121 Bologna BO", pinColor: "black" },
+    { id: "pisa_ilmontino_001", name: "Pizzeria Il Montino", city: "Pisa", date: "2026-05-18", notes: "★4.4 ★ · 2800+ reviews · €6-14 · Pisa 在地人最愛披薩切片/Cecina 鷹嘴豆煎餅 · blackzerolife 點名 · Via del Monte, 1, 56122 Pisa PI", pinColor: "black" },
+    { id: "pisa_europeo_001", name: "Pizzeria L'Europeo", city: "Pisa", date: "2026-05-18", notes: "★4.5 ★ · 1400+ reviews · €8-15 · Pisa 老城手工窯烤披薩 · 份量大價位實惠 · missslow 慢半拍推 · Via Camillo Benso Cavour, 14, 56126 Pisa PI", pinColor: "black" },
+    { id: "bologna_santostefano_001", name: "Cremeria Santo Stefano", city: "Bologna", date: "2026-05-18", notes: "★4.7 ★ · 4000+ reviews · €3-6 · 公認波隆那最好吃手工 gelateria · 奶香濃郁 · 愛玩小圍裙/Nico 推 · Via Santo Stefano, 70/c, 40125 Bologna BO", pinColor: "pink" },
+    { id: "bologna_funivia_001", name: "Cremeria Funivia", city: "Bologna", date: "2026-05-18", notes: "★4.6 ★ · 2500+ reviews · €3-6 · 波隆那市中心人氣手工冰 · Pistacchio 與 Stracciatella · niniyeh 推 · Piazza Camillo Benso di Cavour, 1/D, 40124 Bologna BO", pinColor: "pink" },
+    { id: "pisa_decoltelli_001", name: "Gelateria De' Coltelli", city: "Pisa", date: "2026-05-18", notes: "★4.7 ★ · 3200+ reviews · €3-6 · Pisa Arno 河畔有機手工 gelato · 水果口味招牌 · blackzerolife/莉莉安推 · Lungarno Antonio Pacinotti, 23, 56126 Pisa PI", pinColor: "pink" },
+    { id: "pisa_bottegagelato_001", name: "La Bottega del Gelato", city: "Pisa", date: "2026-05-18", notes: "★4.4 ★ · 3500+ reviews · €3-6 · Pisa 老城 Ponte di Mezzo 橋頭老牌手工冰 · missslow 點名 · Piazza Garibaldi, 11, 56125 Pisa PI", pinColor: "pink" },
+    { id: "napoli_gayodin_001", name: "Gay-Odin", city: "Napoli", date: "2026-05-20", notes: "★4.6 ★ · 1800+ reviews · €5-30 · 拿坡里 1894 年百年手工巧克力店 · 招牌 Foresta 木紋與 Vesuvio 火山造型 · 喵爸喵媽推 · Via Toledo, 214, 80132 Napoli NA", pinColor: "pink" },
+    { id: "napoli_sangregorio_001", name: "Bottega San Gregorio Armeno", city: "Napoli", date: "2026-05-20", notes: "★4.6 ★ · 3200+ reviews · €5-50 · Spaccanapoli 手工陶偶街道 · Presepe 聖誕雕塑工坊 · Wanderlust Annie 推 · Via San Gregorio Armeno, 80138 Napoli NA", pinColor: "pink" },
+    { id: "napoli_talarico_001", name: "Bottega Talarico", city: "Napoli", date: "2026-05-20", notes: "★4.8 ★ · 320+ reviews · €60-300 · 百年手工木柄雨傘工坊 · 工匠現場製作 · Google 高分當地名店 · Vico Due Porte a Toledo, 4/B, 80134 Napoli NA", pinColor: "pink" },
+    { id: "napoli_calace_001", name: "Liuteria Calace 1825", city: "Napoli", date: "2026-05-20", notes: "★4.9 ★ · 220+ reviews · €30-500 · Spaccanapoli 1825 年曼陀林手工樂器世家 · Google 高分當地名店 · Vico San Domenico Maggiore, 9, 80134 Napoli NA", pinColor: "pink" },
+    { id: "napoli_damichele_001", name: "L'Antica Pizzeria da Michele", city: "Napoli", date: "2026-05-20", notes: "★4.4 ★ · 33000+ reviews · €6-10 · 1870 年茱莉亞羅勃茲取景拿坡里披薩聖殿 · 喵爸喵媽/Yuki 都推 · Via Cesare Sersale, 1, 80139 Napoli NA", pinColor: "black" },
+    { id: "napoli_sorbillo_001", name: "Pizzeria Gino e Toto Sorbillo", city: "Napoli", date: "2026-05-20", notes: "★4.4 ★ · 27000+ reviews · €7-12 · 世界冠軍披薩師本店 · 喵爸喵媽/歐遊慢半拍推 · Via dei Tribunali, 32, 80138 Napoli NA", pinColor: "black" },
+    { id: "napoli_dimatteo_001", name: "Antica Pizzeria Di Matteo", city: "Napoli", date: "2026-05-20", notes: "★4.4 ★ · 19000+ reviews · €5-10 · Spaccanapoli 百年披薩 · 柯林頓造訪 · 平價瑪格麗特與炸披薩 · Yuki Pixnet 介紹 · Via dei Tribunali, 94, 80138 Napoli NA", pinColor: "black" },
+    { id: "napoli_pintauro_001", name: "Pintauro 1785", city: "Napoli", date: "2026-05-20", notes: "★4.5 ★ · 1500+ reviews · €3-6 · 1785 年拿坡里千層貝殼酥 Sfogliatella 發源店 · 喵爸喵媽推 · Via Toledo, 275, 80132 Napoli NA", pinColor: "black" },
+    { id: "napoli_tandem_001", name: "Tandem Ragù", city: "Napoli", date: "2026-05-20", notes: "★4.5 ★ · 6800+ reviews · €10-15 · Spaccanapoli 慢燉肉醬麵 Ragù 專門 · 一道菜執著 · Wanderlust Annie 推 · Via Mezzocannone, 16, 80134 Napoli NA", pinColor: "black" },
+    { id: "napoli_mennella_001", name: "Mennella Il Gelato", city: "Napoli", date: "2026-05-20", notes: "★4.7 ★ · 4800+ reviews · €3-6 · 拿坡里第一品牌手工冰 · 1969 創立 · 當地乳源全天然 · Wanderlust Annie 推 · Via Toledo, 110, 80134 Napoli NA", pinColor: "pink" },
+    { id: "napoli_casainfante_001", name: "Casa Infante", city: "Napoli", date: "2026-05-20", notes: "★4.7 ★ · 3200+ reviews · €3-7 · 拿坡里世家手工冰 · 開心果與檸檬招牌 · 喵爸喵媽推 · Via Toledo, 258, 80134 Napoli NA", pinColor: "pink" },
+    { id: "napoli_fantasia_001", name: "Fantasia Gelati", city: "Napoli", date: "2026-05-20", notes: "★4.5 ★ · 2200+ reviews · €3-6 · 1957 年拿坡里老牌 gelato · 傳統 cassata 與杏仁糖 · Google 高分當地名店 · Piazza Vanvitelli, 22, 80129 Napoli NA", pinColor: "pink" },
+    { id: "napoli_scimmia_001", name: "Gelateria della Scimmia", city: "Napoli", date: "2026-05-20", notes: "★4.5 ★ · 2000+ reviews · €3-6 · 1933 年拿坡里第一家棒棒冰 Pinguino · 巧克力脆殼 · Google 高分當地名店 · Piazza Carità, 4, 80134 Napoli NA", pinColor: "pink" },
+    { id: "capri_carthusia_001", name: "Carthusia Profumi di Capri", city: "Capri", date: "2026-05-21", notes: "★4.7 ★ · 1500+ reviews · €30-180 · 1380 年源於 Capri 修道院的花香水品牌 · 島上花朵浸製 · CiaoSanbo/彪彪推 · Viale Matteotti, 2/D, 80073 Capri NA", pinColor: "pink" },
+    { id: "capri_capriwatch_001", name: "Capri Watch", city: "Capri", date: "2026-05-21", notes: "★4.5 ★ · 320+ reviews · €100-500 · Capri 本地設計手錶品牌 · 彩寶與貝殼錶面 · Mimi/BlackMOMO 推 · Via Vittorio Emanuele, 47, 80073 Capri NA", pinColor: "pink" },
+    { id: "positano_brunella_001", name: "La Bottega di Brunella", city: "Positano", date: "2026-05-21", notes: "★4.7 ★ · 280+ reviews · €60-300 · Positano 飄逸亞麻長洋裝代表 · 「波西塔諾風」服飾 · 薇娜之旅/blackzerolife 推 · Via Pasitea, 72, 84017 Positano SA", pinColor: "pink" },
+    { id: "positano_safari_001", name: "Safari Positano", city: "Positano", date: "2026-05-21", notes: "★4.8 ★ · 250+ reviews · €80-180 · Positano 巷弄手工訂製羅馬涼鞋 · 現場量腳當天取 · Google 高分當地名店 · Via della Tartana, 2, 84017 Positano SA", pinColor: "pink" },
+    { id: "amalfi_antichisapori_001", name: "Antichi Sapori d'Amalfi", city: "Amalfi", date: "2026-05-21", notes: "★4.6 ★ · 800+ reviews · €5-30 · Amalfi 主教堂前檸檬糖與 Limoncello 老店 · 阿瑪菲檸檬糖發源處 · 喵爸喵媽推 · Piazza Duomo, 39, 84011 Amalfi SA", pinColor: "pink" },
+    { id: "capri_verginiello_001", name: "Verginiello", city: "Capri", date: "2026-05-21", notes: "★4.5 ★ · 1800+ reviews · €12-18 · Capri 主鎮少數平價海景家庭餐館 · Ravioli Caprese/檸檬義麵 · blackzerolife 推 · Via Lo Palazzo, 25, 80073 Capri NA", pinColor: "black" },
+    { id: "positano_vinipanini_001", name: "Vini e Panini", city: "Positano", date: "2026-05-21", notes: "★4.7 ★ · 2200+ reviews · €8-15 · Positano 海灘上方傳奇三明治店 · 義式火腿三明治+海景 · blackzerolife/薇娜推 · Via del Saracino, 29, 84017 Positano SA", pinColor: "black" },
+    { id: "amalfi_damaria_001", name: "Da Maria", city: "Amalfi", date: "2026-05-21", notes: "★4.4 ★ · 3800+ reviews · €12-18 · Amalfi 主教堂旁老牌窯烤披薩 · 平價海景 · 喵爸喵媽推 · Largo Cesareo Console, 9, 84011 Amalfi SA", pinColor: "black" },
+    { id: "amalfi_ilforno_001", name: "Il Forno (Amalfi)", city: "Amalfi", date: "2026-05-21", notes: "★4.5 ★ · 1200+ reviews · €5-12 · Amalfi 老城 Via Capuano 家庭披薩切片與 Focaccia · Google 高分當地名店 · Via P. Capuano, 27, 84011 Amalfi SA", pinColor: "black" },
+    { id: "capri_buonocore_001", name: "Buonocore Gelateria", city: "Capri", date: "2026-05-21", notes: "★4.5 ★ · 5500+ reviews · €4-8 · Capri 主街傳奇現烤甜筒手工冰 · 譽為「全義最好吃冰淇淋」· blackzerolife/CiaoSanbo 推 · Via Vittorio Emanuele, 35, 80073 Capri NA", pinColor: "pink" },
+    { id: "positano_lazagara_001", name: "La Zagara", city: "Positano", date: "2026-05-21", notes: "★4.5 ★ · 1600+ reviews · €5-8 · Positano 老城檸檬樹下花園露台 · 招牌 Delizia al Limone · 薇娜推 · Via dei Mulini, 6/8, 84017 Positano SA", pinColor: "pink" },
+    { id: "amalfi_pansa_001", name: "Pasticceria Pansa", city: "Amalfi", date: "2026-05-21", notes: "★4.5 ★ · 3200+ reviews · €4-8 · Amalfi 1830 百年甜點 · Sfogliatella Santa Rosa 與檸檬冰 · 喵爸喵媽推 · Piazza Duomo, 40, 84011 Amalfi SA", pinColor: "pink" },
+    { id: "positano_david_001", name: "Gelateria David", city: "Positano", date: "2026-05-21", notes: "★4.6 ★ · 1800+ reviews · €4-7 · Positano 大海灘旁手工冰 · 瑞可達起司無花果招牌 · blackzerolife 推 · Via Marina Grande, 30, 84017 Positano SA", pinColor: "pink" },
+    { id: "roma_smnroma_001", name: "Officina Profumo SMN (Roma)", city: "Roma", date: "2026-05-22", notes: "★4.7 ★ · 750+ reviews · €30-200 · 佛羅倫斯起源 800 年香水藥房羅馬分店 · 招牌 Acqua della Regina · 嗯嗯莉莉嗯推 · Corso del Rinascimento, 47, 00186 Roma RM", pinColor: "pink" },
+    { id: "roma_marmoraro_001", name: "Bottega del Marmoraro", city: "Roma", date: "2026-05-22", notes: "★4.7 ★ · 1100+ reviews · €10-40 · 西班牙廣場北 Via Margutta 手工大理石刻字老店 · 可訂製拉丁文 · Google 高分當地名店 · Via Margutta, 53/B, 00187 Roma RM", pinColor: "pink" },
+    { id: "roma_cartoleria_001", name: "Antica Cartoleria Pantheon", city: "Roma", date: "2026-05-22", notes: "★4.7 ★ · 380+ reviews · €5-50 · Vaticano 與 Pantheon 之間百年文具 · 皮革手帳/羽毛筆/封蠟章 · 嗯嗯莉莉嗯推 · Via degli Orfani, 78, 00186 Roma RM", pinColor: "pink" },
+    { id: "roma_polveretempo_001", name: "Polvere di Tempo (Trastevere)", city: "Roma", date: "2026-05-22", notes: "★4.9 ★ · 600+ reviews · €10-80 · Trastevere 老巷手工日晷沙漏皮革地圖工坊 · moinlala 推 · Via del Moro, 59, 00153 Roma RM", pinColor: "pink" },
+    { id: "vaticano_castroni_001", name: "Castroni Via Cola di Rienzo", city: "Vaticano", date: "2026-05-22", notes: "★4.5 ★ · 4200+ reviews · €5-30 · 梵蒂岡牆外百年義大利食品香料選物 · 咖啡豆巧克力伴手禮 · 嗯嗯莉莉嗯推 · Via Cola di Rienzo, 196, 00192 Roma RM", pinColor: "pink" },
+    { id: "vaticano_pizzarium_001", name: "Pizzarium Bonci", city: "Vaticano", date: "2026-05-22", notes: "★4.5 ★ · 16000+ reviews · €8-15 · Vaticano 西邊 10 分鐘 · 世界級披薩大師 Bonci 起家店 · 黛西優齁齁推 · Via della Meloria, 43, 00136 Roma RM", pinColor: "black" },
+    { id: "roma_boncipizzicheria_001", name: "Bonci Pizzicheria", city: "Roma", date: "2026-05-22", notes: "★4.4 ★ · 1200+ reviews · €8-15 · Trastevere 心臟 Bonci 分店 · 現切披薩切片 · 莫尼卡推 · Via della Lungaretta, 96, 00153 Roma RM", pinColor: "black" },
+    { id: "roma_daenzo_001", name: "Da Enzo al 29", city: "Roma", date: "2026-05-22", notes: "★4.5 ★ · 7800+ reviews · €12-18 · Trastevere Carbonara/Cacio e Pepe 名店 · 排隊勝地 · 黛西推 · Via dei Vascellari, 29, 00153 Roma RM", pinColor: "black" },
+    { id: "roma_trapizzino_001", name: "Trapizzino Trastevere", city: "Roma", date: "2026-05-22", notes: "★4.4 ★ · 1800+ reviews · €5-12 · 羅馬發明三角披薩口袋 · 滷牛尾/青醬牛舌 · 莉莉安/莫尼卡推 · Piazza Trilussa, 46, 00153 Roma RM", pinColor: "black" },
+    { id: "roma_fornocampo_001", name: "Forno Campo de' Fiori", city: "Roma", date: "2026-05-22", notes: "★4.5 ★ · 2400+ reviews · €3-8 · Campo de' Fiori 百年烘焙 · 白披薩 Pizza Bianca · 黛西/莫尼卡推 · Vicolo del Gallo, 14, 00186 Roma RM", pinColor: "black" },
+    { id: "vaticano_delviale_001", name: "Gelateria del Viale (Vaticano)", city: "Vaticano", date: "2026-05-22", notes: "★4.6 ★ · 1300+ reviews · €3-6 · Vaticano 牆外 5 分鐘手工 gelato · 當地家庭客最愛 · Google 高分當地名店 · Viale Giulio Cesare, 183, 00192 Roma RM", pinColor: "pink" },
+    { id: "roma_fiordiluna_001", name: "Fior di Luna (Trastevere)", city: "Roma", date: "2026-05-22", notes: "★4.4 ★ · 1800+ reviews · €3-6 · Trastevere 慢食手工冰 · 無香料無色素限量當日製 · 莫尼卡推 · Via della Lungaretta, 96, 00153 Roma RM", pinColor: "pink" },
+    { id: "roma_otaleg_001", name: "Otaleg!", city: "Roma", date: "2026-05-22", notes: "★4.7 ★ · 5500+ reviews · €3-7 · Trastevere 創意手工 gelato (倒拼 Gelato) · 莫尼卡/黛西推 Top 3 · Via di S. Cosimato, 14a, 00153 Roma RM", pinColor: "pink" },
+    { id: "vaticano_oldbridge_001", name: "Old Bridge Gelateria", city: "Vaticano", date: "2026-05-22", notes: "★4.5 ★ · 16000+ reviews · €3-6 · 梵蒂岡城牆旁傳奇老橋手工冰 · 份量大 CP 高 · 黛西/莉莉安推 · Viale dei Bastioni di Michelangelo, 5, 00192 Roma RM", pinColor: "pink" },
+    { id: "roma_ibiz_001", name: "Ibiz Borse (Pantheon)", city: "Roma", date: "2026-05-23", notes: "★4.8 ★ · 700+ reviews · €60-300 · Pantheon/Campo de' Fiori 中間家族手工皮件三代傳承 · Google 高分當地名店 · Via dei Chiavari, 39, 00186 Roma RM", pinColor: "pink" },
+    { id: "roma_mercatomonti_001", name: "Mercato Monti Urban Market", city: "Roma", date: "2026-05-23", notes: "★4.4 ★ · 600+ reviews · €10-80 · Colosseo 北 Monti 區週末手作設計市集 · taste-of-milano 推 · Via Leonina, 46, 00184 Roma RM", pinColor: "pink" },
+    { id: "roma_tinasondergaard_001", name: "Tina Sondergaard", city: "Roma", date: "2026-05-23", notes: "★4.8 ★ · 220+ reviews · €100-400 · Colosseo 北 Monti 獨立丹麥設計師女裝工坊 · 現場修改 · taste-of-milano 推 · Via del Boschetto, 1/D, 00184 Roma RM", pinColor: "pink" },
+    { id: "roma_nives_001", name: "Pelletteria Nives", city: "Roma", date: "2026-05-23", notes: "★4.9 ★ · 380+ reviews · €80-300 · Pantheon 北家族訂製皮件 · 全程現場手作 · Google 高分當地名店 · Via dei Prefetti, 25, 00186 Roma RM", pinColor: "pink" },
+    { id: "roma_treghinee_001", name: "Le Tre Ghinee", city: "Roma", date: "2026-05-23", notes: "★4.7 ★ · 280+ reviews · €10-60 · Monti 區 boutique 香氛/手工皂/復古文具混合選物 · taste-of-milano 推 · Via Urbana, 122, 00184 Roma RM", pinColor: "pink" },
+    { id: "roma_baffetto_001", name: "Pizzeria da Baffetto", city: "Roma", date: "2026-05-23", notes: "★4.3 ★ · 11000+ reviews · €10-15 · Navona 廣場旁羅馬式薄餅披薩排隊名店 · 莉莉安/黛西推 · Via del Governo Vecchio, 114, 00186 Roma RM", pinColor: "black" },
+    { id: "roma_barberini_001", name: "Osteria Barberini", city: "Roma", date: "2026-05-23", notes: "★4.5 ★ · 5500+ reviews · €14-18 · Pantheon 東邊性價比超高松露專門 osteria · 黑松露麵 €16 · 黛西推 · Via della Purificazione, 21, 00187 Roma RM", pinColor: "black" },
+    { id: "roma_roscioli_001", name: "Roscioli Salumeria", city: "Roma", date: "2026-05-23", notes: "★4.5 ★ · 6200+ reviews · €15-25 · Campo de' Fiori 旁羅馬熟肉舖+小餐館 · Carbonara 全城前三 · 黛西推 · Via dei Giubbonari, 21, 00186 Roma RM", pinColor: "black" },
+    { id: "roma_daremo_001", name: "Pizzeria Da Remo (Testaccio)", city: "Roma", date: "2026-05-23", notes: "★4.4 ★ · 8200+ reviews · €8-15 · Colosseo 南 Testaccio 在地最愛羅馬薄披薩 · 平價接地氣 · hercuriomajesty 推 · Piazza di Santa Maria Liberatrice, 44, 00153 Roma RM", pinColor: "black" },
+    { id: "roma_prezzemolina_001", name: "La Prezzemolina (Monti)", city: "Roma", date: "2026-05-23", notes: "★4.6 ★ · 1500+ reviews · €5-10 · Colosseo 北 Monti 人氣切片披薩 · 20+ 口味現切 · Google 高分當地名店 · Via di San Vito, 8, 00185 Roma RM", pinColor: "black" },
+    { id: "roma_giolitti_001", name: "Gelateria Giolitti", city: "Roma", date: "2026-05-23", notes: "★4.4 ★ · 27000+ reviews · €4-8 · 1890 教宗最愛萬神殿百年冰淇淋 · 鮮奶油加好加滿 · 芒果/Yuki/莉莉安推 · Via degli Uffici del Vicario, 40, 00186 Roma RM", pinColor: "pink" },
+    { id: "roma_dellapalma_001", name: "Gelateria Della Palma", city: "Roma", date: "2026-05-23", notes: "★4.3 ★ · 25000+ reviews · €4-7 · Pantheon 旁 150 種口味手工冰 · 五彩繽紛拍照神店 · 莉莉安/莫尼卡推 · Via della Maddalena, 19/23, 00186 Roma RM", pinColor: "pink" },
+    { id: "roma_frigidarium_001", name: "Frigidarium", city: "Roma", date: "2026-05-23", notes: "★4.7 ★ · 21000+ reviews · €3-5 · Navona 廣場旁招牌外裹黑/白巧克力脆殼手工冰 · 莫尼卡/莉莉安推 Top 3 · Via del Governo Vecchio, 112, 00186 Roma RM", pinColor: "pink" },
+    { id: "roma_fassi_001", name: "Gelateria Fassi 1880", city: "Roma", date: "2026-05-23", notes: "★4.4 ★ · 11000+ reviews · €4-7 · Colosseo 東北 15 分鐘羅馬最古老 1880 年冰宮 · 自製 Sanpietrino · 莉莉安推 · Via Principe Eugenio, 65, 00185 Roma RM", pinColor: "pink" },
   ];
   const notebooks = {};
   notebooks["2026-05-15"] = "桃園機場";
@@ -3096,7 +3177,7 @@ function buildSampleItinerary() {
 
 const SAMPLE_DATA = buildSampleItinerary();
 // Bump this whenever buildSampleItinerary above changes, so unmodified viewers see the latest on next load.
-const DATA_VERSION = '2026-05-11-10';
+const DATA_VERSION = '2026-05-12-1';
 
 let state = loadState() || {
   trip: { startDate: defaultStart, days: 11 },
@@ -5761,6 +5842,49 @@ function migrateRomaSouvenirsNote_v1() {
   saveState({ silent: true });
 }
 
+function migrateAddMultiCityShops_v1() {
+  if (state._multicity_shops_v1) return;
+  const TARGET_IDS = [
+    // 2026-05-16 Milano (13)
+    'milano_cavalli_001','milano_marvis_001','milano_10corsocomo_001','milano_profumobrera_001','milano_fabriano_001',
+    'milano_spontini_001','milano_desantis_001','milano_anticovinaio_001','milano_princi_001',
+    'milano_dellamusica_001','milano_biancolatte_001','milano_laromana_001','milano_cioccolatitaliani_001',
+    // 2026-05-18 Bologna+Pisa (14)
+    'bologna_tamburini_001','bologna_majani_001','bologna_mercatoerbe_001','bologna_dersut_001','pisa_profumopisano_001',
+    'bologna_orsa_001','bologna_sfogliarina_001','bologna_momortadella_001','pisa_ilmontino_001','pisa_europeo_001',
+    'bologna_santostefano_001','bologna_funivia_001','pisa_decoltelli_001','pisa_bottegagelato_001',
+    // 2026-05-20 Napoli (13)
+    'napoli_gayodin_001','napoli_sangregorio_001','napoli_talarico_001','napoli_calace_001',
+    'napoli_damichele_001','napoli_sorbillo_001','napoli_dimatteo_001','napoli_pintauro_001','napoli_tandem_001',
+    'napoli_mennella_001','napoli_casainfante_001','napoli_fantasia_001','napoli_scimmia_001',
+    // 2026-05-21 Capri+Positano+Amalfi (13)
+    'capri_carthusia_001','capri_capriwatch_001','positano_brunella_001','positano_safari_001','amalfi_antichisapori_001',
+    'capri_verginiello_001','positano_vinipanini_001','amalfi_damaria_001','amalfi_ilforno_001',
+    'capri_buonocore_001','positano_lazagara_001','amalfi_pansa_001','positano_david_001',
+    // 2026-05-22 Roma west (14)
+    'roma_smnroma_001','roma_marmoraro_001','roma_cartoleria_001','roma_polveretempo_001','vaticano_castroni_001',
+    'vaticano_pizzarium_001','roma_boncipizzicheria_001','roma_daenzo_001','roma_trapizzino_001','roma_fornocampo_001',
+    'vaticano_delviale_001','roma_fiordiluna_001','roma_otaleg_001','vaticano_oldbridge_001',
+    // 2026-05-23 Roma east (14)
+    'roma_ibiz_001','roma_mercatomonti_001','roma_tinasondergaard_001','roma_nives_001','roma_treghinee_001',
+    'roma_baffetto_001','roma_barberini_001','roma_roscioli_001','roma_daremo_001','roma_prezzemolina_001',
+    'roma_giolitti_001','roma_dellapalma_001','roma_frigidarium_001','roma_fassi_001'
+  ];
+  state.backups = state.backups || [];
+  const existingIds = new Set(state.backups.map(b => b.id));
+  const sampleById = new Map((SAMPLE_DATA.backups || []).map(b => [b.id, b]));
+  TARGET_IDS.forEach(id => {
+    if (!existingIds.has(id)) {
+      const sample = sampleById.get(id);
+      if (sample) {
+        state.backups.push({ ...sample });
+      }
+    }
+  });
+  state._multicity_shops_v1 = true;
+  saveState({ silent: true });
+}
+
 function migrateCategoryToXingcheng() {
   if (state._cat_xc_v1) return;
   const KEEP = new Set(['船程','航班','集合','必逛必吃','早餐','午餐','晚餐','精品','自由活動','住宿','出境','入境']);
@@ -6021,6 +6145,7 @@ function init() {
   migrateAddVeneziaRestaurants_v1();
   migrateAddFirenzeShops_v1();
   migrateRomaSouvenirsNote_v1();
+  migrateAddMultiCityShops_v1();
   state.hasUserEdits = prevUserEdits; // migrations don't count as user edits
   // Now check if SAMPLE_DATA changed since this state was last touched and refresh for pristine viewers
   maybeRefreshFromSample();
