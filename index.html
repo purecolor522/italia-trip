@@ -1043,6 +1043,7 @@
   .map-pin span { transform: rotate(45deg); color: var(--oat-100); font-family: 'Cormorant Garamond', serif; font-size: 14px; font-weight: 600; }
   .map-pin.saved { background: var(--accent-rose); }
   .map-pin.manual { background: var(--ink-500); }
+  .map-pin.food { background: #6F4520; }
   .me-pin {
     width: 18px; height: 18px;
     background: var(--accent-rose);
@@ -1093,6 +1094,7 @@
   }
   .legend-pin.red { background: var(--accent-rose); }
   .legend-pin.grey { background: var(--ink-500); }
+  .legend-pin.brown { background: #6F4520; }
   .trip-info-row .dropdown-trigger {
     background: transparent;
     border: none;
@@ -1169,6 +1171,7 @@
   }
   .pin-list-item .pin-num.saved { background: var(--accent-rose); }
   .pin-list-item .pin-num.manual { background: var(--ink-500); }
+  .pin-list-item .pin-num.food { background: #6F4520; }
   .pin-list-item .pin-name {
     flex: 1;
     font-size: 14px;
@@ -2434,8 +2437,12 @@
           <span>必逛必吃／精品</span>
         </div>
         <div class="legend-item">
+          <span class="legend-pin brown"></span>
+          <span>備用美食</span>
+        </div>
+        <div class="legend-item">
           <span class="legend-pin grey"></span>
-          <span>備用景點</span>
+          <span>備用其他</span>
         </div>
       </div>
       <div id="map-container">
@@ -3177,7 +3184,7 @@ function buildSampleItinerary() {
 
 const SAMPLE_DATA = buildSampleItinerary();
 // Bump this whenever buildSampleItinerary above changes, so unmodified viewers see the latest on next load.
-const DATA_VERSION = '2026-05-12-1';
+const DATA_VERSION = '2026-05-12-2';
 
 let state = loadState() || {
   trip: { startDate: defaultStart, days: 11 },
@@ -4307,6 +4314,36 @@ function clearMapPins() {
   mapMarkers = [];
   mapMarkerById = {};
 }
+const FOOD_KEYWORDS = [
+  // Italian — food places/types
+  'trattoria','osteria','pizzeria','pizza','pinsa','pizzicheria','ristorante',
+  'gelateria','gelato','gelati','pasticceria','panificio','forno',
+  'panini','panino','paninoteca','pasta','salumeria','norcineria','caffe','caffè',
+  'cantina','bacaro','taverna','birreria','birraria','vinaio','enoteca',
+  'vino','vini','cucina','mozzarella','sfogliatella','sfoglia','sfoglie',
+  'formaggio','dolci','dolce','cremeria','porchetteria','porchetta',
+  'focaccia','schiacciata','tramezzino','cicchetti','aperitivo',
+  'mortadella','salame','prosciutto','ragu','ragù','carbonara','cacio',
+  'tartufo','pecorino','parmigiano','limoncello','grappa','amaro','liquore',
+  // Italian — specific brands/names that are clearly food
+  'venchi','illy','lavazza','pansa','tonolo','infante','mennella','scimmia',
+  'tandem','zagara','fior di luna','sapori','antichi sapori',
+  // English
+  'cafe','coffee','bakery','pastry','sandwich','snack','restaurant',
+  'deli','ice cream','icecream','wine bar','latte',
+  // Chinese — food types
+  '餐廳','餐館','小吃','冰淇淋','冰','咖啡','酒館','酒吧','餃',
+  '麵店','麵食','麵包','義麵','披薩','火腿','巧克力','甜點','糕','蛋糕',
+  '烘焙','食品','糖','醋','醬','肉醬','牛肚','生火腿','熟肉','葡萄酒',
+  '起司','烤肉','飲料','茶','手工冰'
+];
+function isBackupFood(b) {
+  if (!b) return false;
+  const text = ((b.name || '') + ' ' + (b.notes || '')).toLowerCase();
+  for (const k of FOOD_KEYWORDS) if (text.includes(k.toLowerCase())) return true;
+  return false;
+}
+
 async function renderMapPins() {
   if (!map) return;
   clearMapPins();
@@ -4335,7 +4372,9 @@ async function renderMapPins() {
       saveState({ silent: true });
     }
     // Pin color priority: manual (not from itinerary) → grey; else pink for saved, black default
-    const colorClass = !b.fromItinerary ? 'manual' : (b.pinColor === 'pink' ? 'saved' : '');
+    const colorClass = !b.fromItinerary
+      ? (isBackupFood(b) ? 'food' : 'manual')
+      : (b.pinColor === 'pink' ? 'saved' : '');
     const html = `<div class="map-pin ${colorClass}"><span>★</span></div>`;
     const icon = L.divIcon({ html, className: '', iconSize: [32, 40], iconAnchor: [16, 38] });
     const marker = L.marker([coord.lat, coord.lng], { icon }).addTo(map);
@@ -4548,7 +4587,9 @@ function renderPinListDropdown() {
   if (savedItems.length > 0) {
     html += '<div class="pin-list-section"><h5>已加入地圖</h5>';
     savedItems.forEach(b => {
-      const colorClass = !b.fromItinerary ? 'manual' : (b.pinColor === 'pink' ? 'saved' : '');
+      const colorClass = !b.fromItinerary
+        ? (isBackupFood(b) ? 'food' : 'manual')
+        : (b.pinColor === 'pink' ? 'saved' : '');
       html += `
         <button class="pin-list-item" type="button" onclick="flyToPin('${b.id}')">
           <span class="pin-num ${colorClass}">★</span>
