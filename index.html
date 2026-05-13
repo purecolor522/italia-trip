@@ -2995,7 +2995,6 @@ function buildSampleItinerary() {
     { id: "moyens30er5bpz", time: "14:00", place: "波隆那→比薩", city: "Bologna", category: "行程", duration: "2 小時" },
     { id: "moydb2ibtcgn0t", time: "15:00", place: "比薩斜塔 Torre di Pisa", city: "Pisa", category: "行程", duration: "1.5 小時", notes: "世界七大建築奇景之一 · 伽利略誕生地" },
     { id: "moydb2ibobfotm", time: "19:00", place: "義式風味晚餐", city: "Pisa", category: "住宿", notes: "宿比薩 / 托斯卡納" },
-    { id: "mozu4loiasvauv", time: "", place: "再測", city: "Bologna", category: "" },
   ];
   itineraries["2026-05-19"] = [
     { id: "moydb2ibnxozqo", time: "08:00", place: "飯店早餐", city: "Pisa", category: "早餐", notes: "飯店內自助式早餐" },
@@ -3196,7 +3195,7 @@ function buildSampleItinerary() {
 
 const SAMPLE_DATA = buildSampleItinerary();
 // Bump this whenever buildSampleItinerary above changes, so unmodified viewers see the latest on next load.
-const DATA_VERSION = '2026-05-13-2';
+const DATA_VERSION = '2026-05-13-3';
 
 let state = loadState() || {
   trip: { startDate: defaultStart, days: 11 },
@@ -5895,6 +5894,35 @@ function migrateRomaSouvenirsNote_v1() {
   saveState({ silent: true });
 }
 
+function migrateCleanupTestData_v1() {
+  if (state._cleanup_test_v1) return;
+  // Remove stale test entries that snuck into earlier exports
+  const TEST_ITIN_IDS = new Set(['mozu4loiasvauv','mozlmphmgldwu2']);
+  const TEST_PLACES = new Set(['測試','再測','test','TEST']);
+  Object.keys(state.itineraries || {}).forEach(d => {
+    state.itineraries[d] = (state.itineraries[d] || []).filter(it => {
+      if (TEST_ITIN_IDS.has(it.id)) return false;
+      if (it && TEST_PLACES.has((it.place || '').trim())) return false;
+      return true;
+    });
+  });
+  // Also remove any test backup
+  if (Array.isArray(state.backups)) {
+    state.backups = state.backups.filter(b => !TEST_PLACES.has((b.name || '').trim()));
+  }
+  // Clean obvious test notebook entries
+  if (state.notebooks) {
+    for (const k of Object.keys(state.notebooks)) {
+      const v = (state.notebooks[k] || '').trim();
+      if (v === '推推推推' || v === '槓槓槓槓' || v === '測試' || v === 'test') {
+        delete state.notebooks[k];
+      }
+    }
+  }
+  state._cleanup_test_v1 = true;
+  saveState({ silent: true });
+}
+
 function migrateAddMultiCityShops_v1() {
   if (state._multicity_shops_v1) return;
   const TARGET_IDS = [
@@ -6199,6 +6227,7 @@ function init() {
   migrateAddFirenzeShops_v1();
   migrateRomaSouvenirsNote_v1();
   migrateAddMultiCityShops_v1();
+  migrateCleanupTestData_v1();
   state.hasUserEdits = prevUserEdits; // migrations don't count as user edits
   // Now check if SAMPLE_DATA changed since this state was last touched and refresh for pristine viewers
   maybeRefreshFromSample();
