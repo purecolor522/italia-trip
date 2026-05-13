@@ -82,6 +82,18 @@
   }
   .app-header { flex-shrink: 0; }
   .date-strip-wrap { flex-shrink: 0; }
+
+  /* Tablet & larger (iPad, desktop). Phones (< 768px) are unchanged. */
+  @media (min-width: 768px) {
+    body { background: var(--oat-200); }
+    .app {
+      max-width: 640px;
+      box-shadow: 0 6px 22px rgba(76,55,30,.08), 0 24px 60px rgba(76,55,30,.10);
+    }
+    .app-header { padding: 24px 28px 14px; }
+    .header-title h1 { font-size: 64px; }
+  }
+
   .pages {
     flex: 1;
     overflow-y: auto;
@@ -3184,7 +3196,7 @@ function buildSampleItinerary() {
 
 const SAMPLE_DATA = buildSampleItinerary();
 // Bump this whenever buildSampleItinerary above changes, so unmodified viewers see the latest on next load.
-const DATA_VERSION = '2026-05-12-2';
+const DATA_VERSION = '2026-05-13-1';
 
 let state = loadState() || {
   trip: { startDate: defaultStart, days: 11 },
